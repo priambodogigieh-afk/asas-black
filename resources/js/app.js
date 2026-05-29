@@ -480,6 +480,60 @@ async function fetchLatestSensorReading() {
     }
 }
 
+function setupMqttConnectButtons() {
+    document.querySelectorAll('[data-mqtt-connect-button]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const originalLabel = button.innerHTML;
+            const container = button.closest('[data-realtime-sensor-dashboard]') || document;
+            const message = container.querySelector('[data-mqtt-connect-message]');
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            button.disabled = true;
+            button.classList.add('opacity-70');
+            button.innerHTML = '<span class="material-symbols-outlined text-[20px]">sync</span>Menghubungkan...';
+
+            if (message) {
+                message.textContent = 'Menjalankan php artisan mqtt:subscribe...';
+            }
+
+            try {
+                const response = await fetch('/mqtt/connect', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: JSON.stringify({}),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Gagal menjalankan subscriber MQTT');
+                }
+
+                const data = await response.json();
+
+                if (message) {
+                    message.textContent = data.message || 'Subscriber MQTT sudah dijalankan.';
+                }
+
+                fetchLatestSensorReading();
+            } catch (error) {
+                if (message) {
+                    message.textContent = 'Gagal menjalankan MQTT. Pastikan server Laravel punya izin menjalankan proses.';
+                }
+            } finally {
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.classList.remove('opacity-70');
+                    button.innerHTML = originalLabel;
+                }, 1200);
+            }
+        });
+    });
+}
+
 function setupRealtimeSensorPolling() {
     if (!document.querySelector('[data-realtime-sensor-dashboard]')) {
         return;
@@ -518,5 +572,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupCharts();
     setupTemperatureJitter();
     setupAsasBlackCalculator();
+    setupMqttConnectButtons();
     setupRealtimeSensorPolling();
 });

@@ -13,9 +13,13 @@
 
         <section class="grid gap-6 lg:grid-cols-[1fr_auto]">
             <article class="metric-card rounded-md p-5">
-                <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">Status Sensor</p>
-                <h2 class="mt-1 text-lg font-black text-[#071d1a] dark:text-[#eafaf8]" data-sensor-status>Menunggu data MQTT</h2>
-                <p class="mt-2 text-sm font-bold text-[#135349] dark:text-[#d6f5f1]" data-sensor-updated>Updated: -</p>
+                <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">Koneksi MQTT</p>
+                <button type="button" data-mqtt-connect-button class="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#30cfb7] px-5 py-3 font-['Geist'] text-sm font-black uppercase tracking-[0.08em] text-[#071d1a] shadow-lg shadow-[#30cfb7]/20 transition hover:bg-[#83e2d4] active:scale-[0.98]">
+                    <span class="material-symbols-outlined text-[20px]">sensors</span>
+                    Konek MQTT
+                </button>
+                <p class="mt-3 text-sm font-bold text-[#135349] dark:text-[#d6f5f1]" data-mqtt-connect-message data-sensor-status>Menunggu koneksi MQTT</p>
+                <p class="mt-1 text-xs font-bold text-[#135349] dark:text-[#d6f5f1]" data-sensor-updated>Updated: -</p>
             </article>
             <article class="metric-card rounded-md p-5">
                 <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">LCD Virtual 16x2</p>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MqttControlController;
 use App\Http\Controllers\PraktikumHistoryController;
 use App\Http\Controllers\TeacherDashboardController;
 use App\Support\Navigation;
@@ -13,6 +14,10 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::get('/register-siswa', fn () => view('pages.register-student'))->name('student.register');
 Route::post('/register-siswa', [AuthController::class, 'registerStudent'])->name('student.register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::post('/mqtt/connect', [MqttControlController::class, 'connect'])
+    ->middleware('auth')
+    ->name('mqtt.connect');
 
 Route::prefix('guru')->name('teacher.')->middleware('auth')->group(function () {
     Route::get('/dashboard', [TeacherDashboardController::class, 'dashboard'])
