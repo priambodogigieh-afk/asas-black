@@ -9,7 +9,7 @@ class SensorReadingController extends Controller
 {
     public function latest(): JsonResponse
     {
-        $reading = SensorReading::query()->latest()->first();
+        $reading = SensorReading::query()->latest('id')->first();
 
         return response()->json([
             'suhu_panas' => $reading?->suhu_panas !== null ? (float) $reading->suhu_panas : 70.0,

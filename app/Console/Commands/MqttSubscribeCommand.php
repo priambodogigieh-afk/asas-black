@@ -38,7 +38,7 @@ class MqttSubscribeCommand extends Command
                     return;
                 }
 
-                $latest = SensorReading::query()->latest()->first();
+                $latest = SensorReading::query()->latest('id')->first();
 
                 SensorReading::create([
                     'suhu_panas' => $column === 'suhu_panas' ? $temperature : $latest?->suhu_panas,
