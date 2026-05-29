@@ -48,6 +48,7 @@ class PraktikumGradingTest extends TestCase
             ->patch(route('teacher.history.grade', ['history' => $history, 'kelas' => 'XI IPA 1']), [
                 'nilai' => 88,
                 'catatan_nilai' => 'Perhitungan sudah rapi.',
+                'status_penilaian' => 'Lulus',
             ])
             ->assertRedirect();
 
@@ -55,6 +56,7 @@ class PraktikumGradingTest extends TestCase
             'id' => $history->id,
             'nilai' => 88,
             'catatan_nilai' => 'Perhitungan sudah rapi.',
+            'status_penilaian' => 'Lulus',
             'dinilai_oleh' => $teacher->id,
         ]);
 
@@ -92,6 +94,7 @@ class PraktikumGradingTest extends TestCase
             'status' => 'Belum Sesuai',
             'nilai' => 76,
             'catatan_nilai' => 'Perlu perbaikan.',
+            'status_penilaian' => 'Revisi',
             'dinilai_oleh' => $teacher->id,
             'dinilai_pada' => now(),
         ]);
@@ -104,6 +107,7 @@ class PraktikumGradingTest extends TestCase
             'id' => $history->id,
             'nilai' => null,
             'catatan_nilai' => null,
+            'status_penilaian' => null,
             'dinilai_oleh' => null,
             'dinilai_pada' => null,
         ]);

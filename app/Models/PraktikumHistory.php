@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'status',
     'nilai',
     'catatan_nilai',
+    'status_penilaian',
     'dinilai_oleh',
     'dinilai_pada',
 ])]

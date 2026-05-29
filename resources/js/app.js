@@ -6,6 +6,16 @@ const tempSeries = {
     mixed: [45, 44.8, 45.2, 45.1, 44.9, 45.3, 45, 45.1],
 };
 
+const defaultSensorState = {
+    suhu_panas: 70,
+    suhu_dingin: 28,
+    suhu_campuran: 45,
+    updated_at: null,
+};
+
+let sensorState = { ...defaultSensorState };
+const realtimeCharts = [];
+
 const chartColors = {
     hot: '#ac2bd4',
     cold: '#30cfb7',
@@ -63,6 +73,16 @@ function nextValue(values) {
     const last = values[values.length - 1];
     const jitter = (Math.random() - 0.5) * 0.7;
     return Number((last + jitter).toFixed(1));
+}
+
+function getSensorValue(key) {
+    const value = Number(sensorState[key]);
+
+    if (Number.isFinite(value)) {
+        return value;
+    }
+
+    return defaultSensorState[key];
 }
 
 function makeTemperatureChart(canvasId) {
@@ -166,32 +186,7 @@ function makeTemperatureChart(canvasId) {
         },
     });
 
-    setInterval(() => {
-        const date = new Date();
-        const label = `${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
-
-        chart.data.labels.push(label);
-        chart.data.labels.shift();
-
-        chart.data.datasets.forEach((dataset, index) => {
-            dataset.data.push(nextValue(dataset.data));
-            dataset.data.shift();
-
-            if (index === 0) {
-                dataset.data[dataset.data.length - 1] = Math.min(72, Math.max(68, dataset.data[dataset.data.length - 1]));
-            }
-
-            if (index === 1) {
-                dataset.data[dataset.data.length - 1] = Math.min(30, Math.max(26, dataset.data[dataset.data.length - 1]));
-            }
-
-            if (index === 2) {
-                dataset.data[dataset.data.length - 1] = Math.min(47, Math.max(43, dataset.data[dataset.data.length - 1]));
-            }
-        });
-
-        chart.update();
-    }, 2200);
+    realtimeCharts.push(chart);
 
     return chart;
 }
@@ -201,6 +196,10 @@ function setupCharts() {
 }
 
 function setupTemperatureJitter() {
+    if (document.querySelector('[data-realtime-sensor-dashboard]')) {
+        return;
+    }
+
     const values = document.querySelectorAll('[data-temp-value]');
 
     if (!values.length) {
@@ -224,15 +223,15 @@ function calculateAsasBlack(form) {
     const hotMass = Number(form.elements.hotMass?.value || 0);
     const coldMass = Number(form.elements.coldMass?.value || 0);
     const hasValidInput = hotMass > 0 && coldMass > 0;
-    const t1 = 70;
-    const t2 = 28;
-    const tc = 45;
+    const t1 = Number(form.elements.suhuPanas?.value || getSensorValue('suhu_panas'));
+    const t2 = Number(form.elements.suhuDingin?.value || getSensorValue('suhu_dingin'));
+    const tc = Number(form.elements.suhuCampuran?.value || getSensorValue('suhu_campuran'));
     const c = 4200;
     const qRelease = hasValidInput ? hotMass * c * (t1 - tc) : 0;
     const qAccept = hasValidInput ? coldMass * c * (tc - t2) : 0;
     const average = (qRelease + qAccept) / 2 || 1;
     const errorPercent = Math.abs(qRelease - qAccept) / average * 100;
-    const isValid = hasValidInput && errorPercent <= 8;
+    const isValid = hasValidInput && errorPercent < 10;
     const container = form.closest('[data-page]') || document;
 
     container.querySelectorAll('[data-q-release]').forEach((item) => {
@@ -252,7 +251,7 @@ function calculateAsasBlack(form) {
     });
 
     container.querySelectorAll('[data-asas-status]').forEach((item) => {
-        item.textContent = hasValidInput ? (isValid ? 'Sesuai Asas Black' : 'Belum Sesuai') : 'Masukkan massa valid';
+        item.textContent = hasValidInput ? (isValid ? 'SESUAI HUKUM ASAS BLACK' : 'TIDAK SESUAI') : 'Masukkan massa valid';
         item.classList.toggle('text-[#30cfb7]', isValid);
         item.classList.toggle('dark:text-[#83e2d4]', isValid);
         item.classList.toggle('text-[#8a23a9]', hasValidInput && !isValid);
@@ -275,7 +274,7 @@ function calculateAsasBlack(form) {
 
     container.querySelectorAll('[data-asas-note]').forEach((item) => {
         item.textContent = hasValidInput
-            ? `Rumus aktif: ${hotMass} x 4200 x (70 - 45) dibandingkan ${coldMass} x 4200 x (45 - 28).`
+            ? `Rumus aktif: ${hotMass} x 4200 x (${t1.toFixed(1)} - ${tc.toFixed(1)}) dibandingkan ${coldMass} x 4200 x (${tc.toFixed(1)} - ${t2.toFixed(1)}).`
             : 'Isi massa air panas dan massa air dingin lebih dari 0 kg untuk menghitung.';
     });
 
@@ -286,7 +285,10 @@ function calculateAsasBlack(form) {
         qAccept,
         deltaQ: Math.abs(qRelease - qAccept),
         errorPercent,
-        status: isValid ? 'Sesuai Asas Black' : 'Belum Sesuai',
+        suhuPanas: t1,
+        suhuDingin: t2,
+        suhuCampuran: tc,
+        status: isValid ? 'SESUAI HUKUM ASAS BLACK' : 'TIDAK SESUAI',
         hasValidInput,
     };
 }
@@ -318,6 +320,9 @@ async function savePraktikumHistory(form, result) {
         delta_q: result.deltaQ,
         error_persen: result.errorPercent,
         status: result.status,
+        suhu_panas: result.suhuPanas,
+        suhu_dingin: result.suhuDingin,
+        suhu_campuran: result.suhuCampuran,
     };
 
     try {
@@ -351,6 +356,140 @@ async function savePraktikumHistory(form, result) {
     }
 }
 
+function formatTemperature(value, fallback = '--') {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return fallback;
+    }
+
+    return number.toFixed(1);
+}
+
+function formatCompactTemperature(value) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return '--';
+    }
+
+    return number.toFixed(number % 1 === 0 ? 0 : 1);
+}
+
+function pushRealtimeChartPoint() {
+    if (!realtimeCharts.length) {
+        return;
+    }
+
+    const date = new Date();
+    const label = `${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+    const values = [
+        getSensorValue('suhu_panas'),
+        getSensorValue('suhu_dingin'),
+        getSensorValue('suhu_campuran'),
+    ];
+
+    realtimeCharts.forEach((chart) => {
+        chart.data.labels.push(label);
+        chart.data.labels.shift();
+
+        chart.data.datasets.forEach((dataset, index) => {
+            dataset.data.push(values[index]);
+            dataset.data.shift();
+        });
+
+        chart.update();
+    });
+}
+
+function updateSensorInterface(reading) {
+    sensorState = {
+        suhu_panas: reading.suhu_panas ?? sensorState.suhu_panas,
+        suhu_dingin: reading.suhu_dingin ?? sensorState.suhu_dingin,
+        suhu_campuran: reading.suhu_campuran ?? sensorState.suhu_campuran,
+        updated_at: reading.updated_at ?? sensorState.updated_at,
+    };
+
+    ['suhu_panas', 'suhu_dingin', 'suhu_campuran'].forEach((key) => {
+        const value = getSensorValue(key);
+
+        document.querySelectorAll(`[data-sensor-value="${key}"]`).forEach((element) => {
+            element.textContent = formatTemperature(value);
+            element.dataset.base = String(value);
+        });
+
+        document.querySelectorAll(`[data-sensor-bar="${key}"]`).forEach((element) => {
+            element.style.width = `${Math.min(100, Math.max(8, value))}%`;
+        });
+
+        document.querySelectorAll(`[data-sensor-drift="${key}"]`).forEach((element) => {
+            element.textContent = reading.updated_at ? 'Live MQTT' : 'Fallback';
+        });
+    });
+
+    document.querySelectorAll('[data-suhu-panas-input]').forEach((input) => {
+        input.value = getSensorValue('suhu_panas');
+    });
+
+    document.querySelectorAll('[data-suhu-dingin-input]').forEach((input) => {
+        input.value = getSensorValue('suhu_dingin');
+    });
+
+    document.querySelectorAll('[data-suhu-campuran-input]').forEach((input) => {
+        input.value = getSensorValue('suhu_campuran');
+    });
+
+    document.querySelectorAll('[data-sensor-status]').forEach((element) => {
+        element.textContent = reading.updated_at ? 'Connected - Sensor Active' : 'Menunggu data MQTT';
+    });
+
+    document.querySelectorAll('[data-sensor-updated]').forEach((element) => {
+        element.textContent = `Updated: ${reading.updated_at || '-'}`;
+    });
+
+    document.querySelectorAll('[data-lcd-line-one]').forEach((element) => {
+        element.textContent = `Hot:${formatCompactTemperature(getSensorValue('suhu_panas'))} Cold:${formatCompactTemperature(getSensorValue('suhu_dingin'))}`;
+    });
+
+    document.querySelectorAll('[data-lcd-line-two]').forEach((element) => {
+        element.textContent = `Mix:${formatCompactTemperature(getSensorValue('suhu_campuran'))}C`;
+    });
+
+    document.querySelectorAll('[data-asas-form]').forEach(calculateAsasBlack);
+    pushRealtimeChartPoint();
+}
+
+async function fetchLatestSensorReading() {
+    try {
+        const response = await fetch('/api/sensor/latest', {
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Sensor endpoint failed');
+        }
+
+        updateSensorInterface(await response.json());
+    } catch (error) {
+        updateSensorInterface({
+            ...sensorState,
+            updated_at: null,
+        });
+    }
+}
+
+function setupRealtimeSensorPolling() {
+    if (!document.querySelector('[data-realtime-sensor-dashboard]')) {
+        return;
+    }
+
+    updateSensorInterface(sensorState);
+    fetchLatestSensorReading();
+    setInterval(fetchLatestSensorReading, 2000);
+}
+
 function setupAsasBlackCalculator() {
     document.querySelectorAll('[data-asas-form]').forEach((form) => {
         form.addEventListener('submit', (event) => {
@@ -379,4 +518,5 @@ document.addEventListener('DOMContentLoaded', () => {
     setupCharts();
     setupTemperatureJitter();
     setupAsasBlackCalculator();
+    setupRealtimeSensorPolling();
 });

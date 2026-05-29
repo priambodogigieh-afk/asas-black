@@ -23,15 +23,18 @@ class PraktikumHistoryController extends Controller
             'delta_q' => ['required', 'numeric', 'min:0'],
             'error_persen' => ['required', 'numeric', 'min:0'],
             'status' => ['required', 'string', 'max:50'],
+            'suhu_panas' => ['nullable', 'numeric'],
+            'suhu_dingin' => ['nullable', 'numeric'],
+            'suhu_campuran' => ['nullable', 'numeric'],
         ]);
 
         $history = PraktikumHistory::create([
             ...$data,
             'user_id' => $request->user()->id,
             'kalor_jenis' => 4200,
-            'suhu_panas' => 70,
-            'suhu_dingin' => 28,
-            'suhu_campuran' => 45,
+            'suhu_panas' => $data['suhu_panas'] ?? 70,
+            'suhu_dingin' => $data['suhu_dingin'] ?? 28,
+            'suhu_campuran' => $data['suhu_campuran'] ?? 45,
         ]);
 
         return response()->json([
@@ -123,11 +126,13 @@ class PraktikumHistoryController extends Controller
         $data = $request->validate([
             'nilai' => ['required', 'integer', 'min:0', 'max:100'],
             'catatan_nilai' => ['nullable', 'string', 'max:1000'],
+            'status_penilaian' => ['required', 'in:Lulus,Revisi'],
         ]);
 
         $history->update([
             'nilai' => $data['nilai'],
             'catatan_nilai' => $data['catatan_nilai'] ?? null,
+            'status_penilaian' => $data['status_penilaian'],
             'dinilai_oleh' => $request->user()->id,
             'dinilai_pada' => now(),
         ]);
@@ -142,6 +147,7 @@ class PraktikumHistoryController extends Controller
         $history->update([
             'nilai' => null,
             'catatan_nilai' => null,
+            'status_penilaian' => null,
             'dinilai_oleh' => null,
             'dinilai_pada' => null,
         ]);

@@ -5,6 +5,7 @@
     'tone' => 'cyan',
     'sensor' => 'DS18B20',
     'change' => '+0.4',
+    'sensorKey' => null,
 ])
 
 @php
@@ -17,7 +18,7 @@
     $toneData = $tones[$tone] ?? $tones['cyan'];
 @endphp
 
-<article class="metric-card group relative overflow-hidden rounded-2xl p-6 transition hover:shadow-md">
+<article class="metric-card group relative overflow-hidden rounded-2xl p-6 transition hover:shadow-md" @if($sensorKey) data-sensor-card="{{ $sensorKey }}" @endif>
     <div class="absolute right-4 top-4 opacity-10">
         <span class="material-symbols-outlined text-7xl {{ $toneData['text'] }}">{{ $toneData['icon'] }}</span>
     </div>
@@ -29,18 +30,18 @@
                 {{ $label }}
             </p>
             <div class="mt-3 flex items-end gap-1">
-                <span class="font-['Geist'] text-4xl font-bold tracking-tight {{ $toneData['text'] }}" data-temp-value data-base="{{ $value }}">{{ $value }}</span>
+                <span class="font-['Geist'] text-4xl font-bold tracking-tight {{ $toneData['text'] }}" data-temp-value data-base="{{ $value }}" @if($sensorKey) data-sensor-value="{{ $sensorKey }}" @endif>{{ $value }}</span>
                 <span class="pb-1 text-2xl font-bold text-[#135349] dark:text-[#d6f5f1]">&deg;{{ $unit }}</span>
             </div>
         </div>
     </div>
 
     <div class="relative mt-6 h-2 w-full overflow-hidden rounded-full bg-[#d6f5f1]/20 dark:bg-[#d6f5f1]/20">
-        <div class="h-full rounded-full transition-all duration-1000" style="width: {{ min(100, max(8, $value)) }}%; background: {{ $toneData['color'] }}"></div>
+        <div class="h-full rounded-full transition-all duration-1000" @if($sensorKey) data-sensor-bar="{{ $sensorKey }}" @endif style="width: {{ min(100, max(8, $value)) }}%; background: {{ $toneData['color'] }}"></div>
     </div>
 
     <div class="relative mt-5 flex items-center justify-between gap-3">
         <span class="rounded-full px-2.5 py-1 font-['Geist'] text-xs font-bold {{ $toneData['soft'] }}">{{ $sensor }}</span>
-        <span class="text-xs font-bold text-[#135349] dark:text-[#d6f5f1]">Drift {{ $change }}&deg;C</span>
+        <span class="text-xs font-bold text-[#135349] dark:text-[#d6f5f1]" @if($sensorKey) data-sensor-drift="{{ $sensorKey }}" @endif>Drift {{ $change }}&deg;C</span>
     </div>
 </article>

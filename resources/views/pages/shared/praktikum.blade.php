@@ -4,7 +4,7 @@
     :role="$role"
     :items="$items"
 >
-    <div class="space-y-6" data-page="student-dashboard">
+    <div class="space-y-6" data-page="student-dashboard" data-realtime-sensor-dashboard>
         @if ($role === 'Siswa' && auth()->user())
             <section class="metric-card rounded-2xl p-5">
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -37,9 +37,28 @@
         @endif
 
         <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <x-temperature-card label="T1: Air Panas" value="70" tone="red" />
-            <x-temperature-card label="T2: Air Dingin" value="28" tone="blue" />
-            <x-temperature-card label="Tc: Air Campuran" value="45" tone="orange" />
+            <x-temperature-card label="T1: Air Panas" value="70" tone="red" sensor-key="suhu_panas" />
+            <x-temperature-card label="T2: Air Dingin" value="28" tone="blue" sensor-key="suhu_dingin" />
+            <x-temperature-card label="Tc: Air Campuran" value="45" tone="orange" sensor-key="suhu_campuran" />
+        </section>
+
+        <section class="grid gap-6 lg:grid-cols-[1fr_auto]">
+            <article class="metric-card rounded-2xl p-5">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">Status Sensor</p>
+                        <h2 class="mt-1 font-['Inter'] text-xl font-black text-[#071d1a] dark:text-[#eafaf8]" data-sensor-status>Menunggu data MQTT</h2>
+                    </div>
+                    <p class="rounded-full bg-[#0a2925] px-4 py-2 font-['Geist'] text-xs font-black text-[#83e2d4]" data-sensor-updated>Updated: -</p>
+                </div>
+            </article>
+            <article class="metric-card rounded-2xl p-5">
+                <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">LCD Virtual 16x2</p>
+                <div class="mt-3 min-w-[260px] rounded-lg border border-[#83e2d4]/30 bg-[#071d1a] p-4 font-mono text-lg font-black leading-7 text-[#ffff99] shadow-inner">
+                    <div data-lcd-line-one>Hot:-- Cold:--</div>
+                    <div data-lcd-line-two>Mix:--C</div>
+                </div>
+            </article>
         </section>
 
         <section class="grid gap-6 xl:grid-cols-[.9fr_1.1fr]">
@@ -68,6 +87,9 @@
                             <input name="coldMass" type="number" min="0.01" step="0.01" value="0.35" inputmode="decimal" required class="mt-2 w-full rounded-lg border border-[#acece2] bg-[#eafaf8] px-4 py-3 font-['Geist'] text-base font-bold outline-none focus:border-[#ac2bd4] focus:ring-4 focus:ring-[#f7eafb] dark:border-[#27a592]/40 dark:bg-[#0a2925]">
                         </label>
                     </div>
+                    <input name="suhuPanas" type="hidden" value="70" data-suhu-panas-input>
+                    <input name="suhuDingin" type="hidden" value="28" data-suhu-dingin-input>
+                    <input name="suhuCampuran" type="hidden" value="45" data-suhu-campuran-input>
                     <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
                         <button type="submit" class="rounded-xl bg-[#ac2bd4] px-5 py-4 font-black text-white shadow-md transition active:scale-95">
                             Hitung Asas Black
@@ -98,7 +120,7 @@
                 </div>
                 <div class="mt-4 inline-flex items-center gap-3 rounded-full border border-[#acece2] bg-[#d6f5f1] px-5 py-3 font-black text-[#1d7c6e]" data-asas-status-pill>
                     <span class="material-symbols-outlined text-[#30cfb7]" style="font-variation-settings: 'FILL' 1;">verified</span>
-                    <span data-asas-status>Sesuai Asas Black</span>
+                    <span data-asas-status>SESUAI HUKUM ASAS BLACK</span>
                 </div>
                 <p class="mt-4 rounded-lg bg-[#eafaf8] px-4 py-3 text-xs font-bold text-[#135349] dark:bg-[#0a2925] dark:text-[#d6f5f1]" data-asas-note>
                     Hasil dihitung otomatis berdasarkan massa air panas dan massa air dingin.

@@ -4,7 +4,7 @@
     role="Guru"
     :items="$items"
 >
-    <div class="space-y-6" data-page="teacher-dashboard">
+    <div class="space-y-6" data-page="teacher-dashboard" data-realtime-sensor-dashboard>
         <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
                 <span class="font-['Geist'] text-xs font-bold uppercase tracking-[0.22em] text-[#30cfb7] dark:text-[#83e2d4]">Physics Faculty Portal</span>
@@ -42,6 +42,39 @@
                     </div>
                 </article>
             @endforeach
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <x-temperature-card label="Suhu Air Panas" value="70" tone="red" sensor="DS18B20 A" sensor-key="suhu_panas" />
+            <x-temperature-card label="Suhu Air Dingin" value="28" tone="blue" sensor="DS18B20 B" sensor-key="suhu_dingin" />
+            <x-temperature-card label="Suhu Campuran" value="45" tone="orange" sensor="DS18B20 C" sensor-key="suhu_campuran" />
+        </section>
+
+        <section class="grid gap-6 lg:grid-cols-[1fr_auto]">
+            <article class="metric-card rounded-2xl p-5">
+                <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">Status Sensor</p>
+                <h2 class="mt-1 font-['Inter'] text-xl font-black text-[#071d1a] dark:text-[#eafaf8]" data-sensor-status>Menunggu data MQTT</h2>
+                <p class="mt-2 text-sm font-bold text-[#135349] dark:text-[#d6f5f1]" data-sensor-updated>Updated: -</p>
+            </article>
+            <article class="metric-card rounded-2xl p-5">
+                <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">LCD Virtual 16x2</p>
+                <div class="mt-3 min-w-[260px] rounded-lg border border-[#83e2d4]/30 bg-[#071d1a] p-4 font-mono text-lg font-black leading-7 text-[#ffff99] shadow-inner">
+                    <div data-lcd-line-one>Hot:-- Cold:--</div>
+                    <div data-lcd-line-two>Mix:--C</div>
+                </div>
+            </article>
+        </section>
+
+        <section class="metric-card rounded-2xl p-6">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">Realtime Chart</p>
+                    <h3 class="font-['Inter'] text-2xl font-black text-[#071d1a] dark:text-[#eafaf8]">Grafik Suhu Sensor</h3>
+                </div>
+            </div>
+            <div class="chart-shell mt-5 h-[340px] rounded-xl border border-[#acece2]/60 bg-[#d6f5f1]/80 p-4 dark:border-[#27a592]/30 dark:bg-[#0a2925]/45">
+                <canvas id="teacherRealtimeChart"></canvas>
+            </div>
         </section>
 
         <section class="space-y-4">
@@ -106,7 +139,7 @@
                                 <td class="px-5 py-4 text-center font-['Geist'] font-semibold">{{ number_format($history->q_terima, 0, ',', '.') }}</td>
                                 <td class="px-5 py-4 text-center font-['Geist'] font-semibold">{{ number_format($history->error_persen, 2) }}%</td>
                                 <td class="px-5 py-4 text-center">
-                                    <span class="rounded-full px-2 py-1 text-[10px] font-black uppercase {{ $history->status === 'Sesuai Asas Black' ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }}">{{ $history->status }}</span>
+                                    <span class="rounded-full px-2 py-1 text-[10px] font-black uppercase {{ in_array($history->status, ['SESUAI HUKUM ASAS BLACK', 'Sesuai Asas Black'], true) ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }}">{{ $history->status }}</span>
                                 </td>
                                 <td class="px-5 py-4 text-center">
                                     @if ($history->nilai !== null)

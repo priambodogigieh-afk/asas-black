@@ -127,7 +127,7 @@
                                 <td class="px-5 py-4 font-['Geist'] text-[#30cfb7]">{{ number_format($history->q_terima, 0, ',', '.') }} J</td>
                                 <td class="px-5 py-4 font-['Geist']">{{ number_format($history->error_persen, 2) }}%</td>
                                 <td class="px-5 py-4">
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-black {{ $history->status === 'Sesuai Asas Black' ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }}">
+                                    <span class="rounded-full px-2.5 py-1 text-xs font-black {{ in_array($history->status, ['SESUAI HUKUM ASAS BLACK', 'Sesuai Asas Black'], true) ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }}">
                                         {{ $history->status }}
                                     </span>
                                 </td>
@@ -135,6 +135,9 @@
                                     @if ($history->nilai !== null)
                                         <div class="font-['Geist'] text-2xl font-bold text-[#30cfb7]">{{ $history->nilai }}</div>
                                         <div class="mt-1 max-w-[220px] text-xs font-semibold text-[#135349] dark:text-[#d6f5f1]">{{ $history->catatan_nilai ?: 'Tanpa catatan' }}</div>
+                                        @if ($history->status_penilaian)
+                                            <div class="mt-1 inline-flex rounded-full {{ $history->status_penilaian === 'Lulus' ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }} px-2 py-1 text-[10px] font-black uppercase">{{ $history->status_penilaian }}</div>
+                                        @endif
                                         @if ($history->dinilai_pada)
                                             <div class="mt-1 text-[10px] font-bold text-[#1d7c6e]">Dinilai {{ $history->dinilai_pada->format('d M Y H:i') }}</div>
                                         @endif
@@ -151,6 +154,10 @@
                                             <input name="nilai" type="number" min="0" max="100" value="{{ old('nilai', $history->nilai ?? '') }}" placeholder="0-100" required class="rounded-lg border border-[#acece2] bg-[#eafaf8] px-3 py-2 font-['Geist'] text-sm font-bold outline-none focus:border-[#ac2bd4] dark:border-[#27a592]/40 dark:bg-[#0a2925]">
                                             <input name="catatan_nilai" type="text" value="{{ old('catatan_nilai', $history->catatan_nilai ?? '') }}" placeholder="Catatan opsional" class="rounded-lg border border-[#acece2] bg-[#eafaf8] px-3 py-2 text-sm font-semibold outline-none focus:border-[#ac2bd4] dark:border-[#27a592]/40 dark:bg-[#0a2925]">
                                         </div>
+                                        <select name="status_penilaian" required class="rounded-lg border border-[#acece2] bg-[#eafaf8] px-3 py-2 text-sm font-bold outline-none focus:border-[#ac2bd4] dark:border-[#27a592]/40 dark:bg-[#0a2925]">
+                                            <option value="Lulus" @selected(old('status_penilaian', $history->status_penilaian ?? 'Lulus') === 'Lulus')>Lulus</option>
+                                            <option value="Revisi" @selected(old('status_penilaian', $history->status_penilaian ?? '') === 'Revisi')>Revisi</option>
+                                        </select>
                                         </form>
                                         <div class="grid gap-2 {{ $history->nilai !== null ? 'grid-cols-2' : 'grid-cols-1' }}">
                                             <button type="submit" form="grade-form-{{ $history->id }}" class="rounded-lg bg-[#ac2bd4] px-3 py-2 text-xs font-black text-white">

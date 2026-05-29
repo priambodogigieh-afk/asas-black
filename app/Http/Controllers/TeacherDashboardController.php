@@ -29,7 +29,7 @@ class TeacherDashboardController extends Controller
             'students' => $students,
             'histories' => $histories,
             'averageError' => $histories->avg('error_persen') ?? 0,
-            'successCount' => $histories->where('status', 'Sesuai Asas Black')->count(),
+            'successCount' => $histories->filter(fn (PraktikumHistory $history): bool => in_array($history->status, ['SESUAI HUKUM ASAS BLACK', 'Sesuai Asas Black'], true))->count(),
             'gradedCount' => $histories->whereNotNull('nilai')->count(),
         ]);
     }

@@ -18,7 +18,7 @@
             </article>
             <article class="metric-card rounded-2xl p-5">
                 <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#135349] dark:text-[#d6f5f1]">Sesuai Asas Black</p>
-                <p class="mt-3 font-['Geist'] text-4xl font-bold text-[#30cfb7]">{{ $histories->where('status', 'Sesuai Asas Black')->count() }}</p>
+                <p class="mt-3 font-['Geist'] text-4xl font-bold text-[#30cfb7]">{{ $histories->filter(fn ($history) => in_array($history->status, ['SESUAI HUKUM ASAS BLACK', 'Sesuai Asas Black'], true))->count() }}</p>
                 <p class="mt-2 text-xs font-bold text-[#30cfb7]">Status valid</p>
             </article>
         </section>
@@ -53,7 +53,7 @@
                                 <td class="px-5 py-4 font-['Geist'] font-semibold">{{ number_format($history->delta_q, 0, ',', '.') }} J</td>
                                 <td class="px-5 py-4 font-['Geist'] font-semibold">{{ number_format($history->error_persen, 2) }}%</td>
                                 <td class="px-5 py-4">
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-black {{ $history->status === 'Sesuai Asas Black' ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }}">
+                                    <span class="rounded-full px-2.5 py-1 text-xs font-black {{ in_array($history->status, ['SESUAI HUKUM ASAS BLACK', 'Sesuai Asas Black'], true) ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }}">
                                         {{ $history->status }}
                                     </span>
                                 </td>
@@ -61,6 +61,9 @@
                                     @if ($history->nilai !== null)
                                         <div class="font-['Geist'] text-2xl font-bold text-[#30cfb7]">{{ $history->nilai }}</div>
                                         <div class="mt-1 max-w-[220px] text-xs font-semibold text-[#135349] dark:text-[#d6f5f1]">{{ $history->catatan_nilai ?: 'Tanpa catatan' }}</div>
+                                        @if ($history->status_penilaian)
+                                            <div class="mt-1 inline-flex rounded-full {{ $history->status_penilaian === 'Lulus' ? 'bg-[#d6f5f1] text-[#1d7c6e]' : 'bg-[#f7eafb] text-[#8a23a9]' }} px-2 py-1 text-[10px] font-black uppercase">{{ $history->status_penilaian }}</div>
+                                        @endif
                                     @else
                                         <span class="rounded-full bg-[#eafaf8] px-2.5 py-1 text-xs font-black text-[#135349] dark:bg-[#0a2925] dark:text-[#d6f5f1]">Belum dinilai</span>
                                     @endif
