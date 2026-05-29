@@ -14,7 +14,7 @@ return [
             'port' => (int) env('MQTT_PORT', 1883),
             'protocol' => MqttClient::MQTT_3_1,
             'client_id' => env('MQTT_CLIENT_ID', 'laravel_asas_black_dashboard'),
-            'use_clean_session' => env('MQTT_CLEAN_SESSION', true),
+            'use_clean_session' => env('MQTT_CLEAN_SESSION', false),
             'enable_logging' => env('MQTT_ENABLE_LOGGING', true),
             'log_channel' => env('MQTT_LOG_CHANNEL'),
             'repository' => MemoryRepository::class,
