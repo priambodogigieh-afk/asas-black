@@ -219,13 +219,23 @@ function formatJoules(value) {
     return `${Math.round(value).toLocaleString('id-ID')} J`;
 }
 
+function roundTemperatureForCalculation(value) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+        return 0;
+    }
+
+    return Number(number.toFixed(1));
+}
+
 function calculateAsasBlack(form) {
     const hotMass = Number(form.elements.hotMass?.value || 0);
     const coldMass = Number(form.elements.coldMass?.value || 0);
     const hasValidInput = hotMass > 0 && coldMass > 0;
-    const t1 = Number(form.elements.suhuPanas?.value || getSensorValue('suhu_panas'));
-    const t2 = Number(form.elements.suhuDingin?.value || getSensorValue('suhu_dingin'));
-    const tc = Number(form.elements.suhuCampuran?.value || getSensorValue('suhu_campuran'));
+    const t1 = roundTemperatureForCalculation(form.elements.suhuPanas?.value || getSensorValue('suhu_panas'));
+    const t2 = roundTemperatureForCalculation(form.elements.suhuDingin?.value || getSensorValue('suhu_dingin'));
+    const tc = roundTemperatureForCalculation(form.elements.suhuCampuran?.value || getSensorValue('suhu_campuran'));
     const c = 4200;
     const qRelease = hasValidInput ? hotMass * c * (t1 - tc) : 0;
     const qAccept = hasValidInput ? coldMass * c * (tc - t2) : 0;
@@ -418,15 +428,15 @@ function updateSensorInterface(reading) {
     });
 
     document.querySelectorAll('[data-suhu-panas-input]').forEach((input) => {
-        input.value = getSensorValue('suhu_panas');
+        input.value = formatTemperature(getSensorValue('suhu_panas'));
     });
 
     document.querySelectorAll('[data-suhu-dingin-input]').forEach((input) => {
-        input.value = getSensorValue('suhu_dingin');
+        input.value = formatTemperature(getSensorValue('suhu_dingin'));
     });
 
     document.querySelectorAll('[data-suhu-campuran-input]').forEach((input) => {
-        input.value = getSensorValue('suhu_campuran');
+        input.value = formatTemperature(getSensorValue('suhu_campuran'));
     });
 
     document.querySelectorAll('[data-sensor-status]').forEach((element) => {
