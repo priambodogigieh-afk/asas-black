@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
 
-Route::get('/login', fn () => view('pages.login'))->name('login');
+Route::get('/login', fn () => view('pages.auth.login'))->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::get('/register-siswa', fn () => view('pages.register-student'))->name('student.register');
+Route::get('/register-siswa', fn () => view('pages.auth.register-student'))->name('student.register');
 Route::post('/register-siswa', [AuthController::class, 'registerStudent'])->name('student.register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -24,7 +24,9 @@ Route::prefix('guru')->name('teacher.')->middleware('auth')->group(function () {
         ->name('dashboard');
 
     Route::get('/monitoring-sensor', function () {
-        abort_unless(auth()->user()?->role === 'guru', 403);
+        if (auth()->user()?->role !== 'guru') {
+            return redirect()->route('student.praktikum');
+        }
 
         return view('pages.shared.monitoring', [
             'items' => Navigation::teacherItems(),
@@ -44,7 +46,9 @@ Route::prefix('guru')->name('teacher.')->middleware('auth')->group(function () {
 
 Route::prefix('siswa')->name('student.')->middleware('auth')->group(function () {
     Route::get('/praktikum', function () {
-        abort_unless(auth()->user()?->role === 'siswa', 403);
+        if (auth()->user()?->role !== 'siswa') {
+            return redirect()->route('teacher.dashboard');
+        }
 
         return view('pages.shared.praktikum', [
             'items' => Navigation::studentItems(),
@@ -56,7 +60,9 @@ Route::prefix('siswa')->name('student.')->middleware('auth')->group(function () 
         ->name('praktikum.history.store');
 
     Route::get('/materi', function () {
-        abort_unless(auth()->user()?->role === 'siswa', 403);
+        if (auth()->user()?->role !== 'siswa') {
+            return redirect()->route('teacher.dashboard');
+        }
 
         return view('pages.shared.materi', [
             'items' => Navigation::studentItems(),

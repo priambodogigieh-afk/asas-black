@@ -6,6 +6,7 @@ use App\Models\PraktikumHistory;
 use App\Models\User;
 use App\Support\Navigation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -13,7 +14,11 @@ class PraktikumHistoryController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
-        abort_unless($request->user()?->role === 'siswa', 403);
+        if ($request->user()?->role !== 'siswa') {
+            return response()->json([
+                'message' => 'Riwayat hanya bisa disimpan oleh akun siswa.',
+            ], 403);
+        }
 
         $data = $request->validate([
             'massa_panas' => ['required', 'numeric', 'min:0.01'],
@@ -43,9 +48,11 @@ class PraktikumHistoryController extends Controller
         ]);
     }
 
-    public function studentHistory(Request $request): View
+    public function studentHistory(Request $request): View|RedirectResponse
     {
-        abort_unless($request->user()?->role === 'siswa', 403);
+        if ($request->user()?->role !== 'siswa') {
+            return redirect()->route('teacher.dashboard');
+        }
 
         $histories = PraktikumHistory::query()
             ->where('user_id', $request->user()?->id)
@@ -59,9 +66,11 @@ class PraktikumHistoryController extends Controller
         ]);
     }
 
-    public function teacherHistory(Request $request): View
+    public function teacherHistory(Request $request): View|RedirectResponse
     {
-        abort_unless($request->user()?->role === 'guru', 403);
+        if ($request->user()?->role !== 'guru') {
+            return redirect()->route('student.history');
+        }
 
         $students = User::query()
             ->where('role', 'siswa')
@@ -121,7 +130,9 @@ class PraktikumHistoryController extends Controller
 
     public function grade(Request $request, PraktikumHistory $history)
     {
-        abort_unless($request->user()?->role === 'guru', 403);
+        if ($request->user()?->role !== 'guru') {
+            return redirect()->route('student.praktikum');
+        }
 
         $data = $request->validate([
             'nilai' => ['required', 'integer', 'min:0', 'max:100'],
@@ -142,7 +153,9 @@ class PraktikumHistoryController extends Controller
 
     public function destroyGrade(Request $request, PraktikumHistory $history)
     {
-        abort_unless($request->user()?->role === 'guru', 403);
+        if ($request->user()?->role !== 'guru') {
+            return redirect()->route('student.praktikum');
+        }
 
         $history->update([
             'nilai' => null,

@@ -17,11 +17,11 @@ let sensorState = { ...defaultSensorState };
 const realtimeCharts = [];
 
 const chartColors = {
-    hot: '#ac2bd4',
-    cold: '#30cfb7',
-    mixed: '#8a23a9',
-    grid: 'rgba(131, 226, 212, 0.20)',
-    text: '#d6f5f1',
+    hot: '#eb1446',
+    cold: '#06f9b8',
+    mixed: '#ffb300',
+    grid: 'rgba(177, 206, 231, 0.20)',
+    text: '#ebf3f9',
 };
 
 function setupLoginForm() {
@@ -50,7 +50,7 @@ function setupRegisterForm() {
 
         if (password !== passwordConfirm) {
             status.textContent = 'Password dan konfirmasi password belum sama.';
-            status.className = 'rounded-lg bg-[#f7eafb] px-4 py-3 text-xs font-bold text-[#8a23a9]';
+            status.className = 'rounded-lg bg-[#fde8ed] px-4 py-3 text-xs font-bold text-[#8d0c2a]';
             return;
         }
 
@@ -65,7 +65,7 @@ function setupRegisterForm() {
 
         localStorage.setItem('asas-black-student-account', JSON.stringify(account));
         status.textContent = `Akun ${account.name} berhasil dibuat secara dummy. Email: ${account.email}, NIS: ${account.nis}, Kelas: ${account.className}, Jurusan: ${account.major}.`;
-        status.className = 'rounded-lg bg-[#d6f5f1] px-4 py-3 text-xs font-bold text-[#1d7c6e]';
+        status.className = 'rounded-lg bg-[#e6fef8] px-4 py-3 text-xs font-bold text-[#03634a]';
     });
 }
 
@@ -103,7 +103,7 @@ function makeTemperatureChart(canvasId) {
                     label: 'Suhu Panas',
                     data: [...tempSeries.hot],
                     borderColor: chartColors.hot,
-                    backgroundColor: 'rgba(172, 43, 212, 0.12)',
+                    backgroundColor: 'rgba(235, 20, 70, 0.12)',
                     borderWidth: 3,
                     tension: 0.42,
                     pointRadius: 3,
@@ -113,7 +113,7 @@ function makeTemperatureChart(canvasId) {
                     label: 'Suhu Dingin',
                     data: [...tempSeries.cold],
                     borderColor: chartColors.cold,
-                    backgroundColor: 'rgba(48, 207, 183, 0.10)',
+                    backgroundColor: 'rgba(6, 249, 184, 0.10)',
                     borderWidth: 3,
                     tension: 0.42,
                     pointRadius: 3,
@@ -123,7 +123,7 @@ function makeTemperatureChart(canvasId) {
                     label: 'Suhu Campuran',
                     data: [...tempSeries.mixed],
                     borderColor: chartColors.mixed,
-                    backgroundColor: 'rgba(138, 35, 169, 0.10)',
+                    backgroundColor: 'rgba(255, 179, 0, 0.10)',
                     borderWidth: 3,
                     tension: 0.42,
                     pointRadius: 3,
@@ -252,24 +252,24 @@ function calculateAsasBlack(form) {
 
     container.querySelectorAll('[data-asas-status]').forEach((item) => {
         item.textContent = hasValidInput ? (isValid ? 'SESUAI HUKUM ASAS BLACK' : 'TIDAK SESUAI') : 'Masukkan massa valid';
-        item.classList.toggle('text-[#30cfb7]', isValid);
-        item.classList.toggle('dark:text-[#83e2d4]', isValid);
-        item.classList.toggle('text-[#8a23a9]', hasValidInput && !isValid);
-        item.classList.toggle('dark:text-[#cd80e5]', hasValidInput && !isValid);
-        item.classList.toggle('text-[#135349]', !hasValidInput);
-        item.classList.toggle('dark:text-[#d6f5f1]', !hasValidInput);
+        item.classList.toggle('text-[#04956e]', isValid);
+        item.classList.toggle('dark:text-[#9cfce3]', isValid);
+        item.classList.toggle('text-[#eb1446]', hasValidInput && !isValid);
+        item.classList.toggle('dark:text-[#f7a1b5]', hasValidInput && !isValid);
+        item.classList.toggle('text-[#0c1a27]', !hasValidInput);
+        item.classList.toggle('dark:text-[#ebf3f9]', !hasValidInput);
     });
 
     container.querySelectorAll('[data-asas-status-pill]').forEach((item) => {
-        item.classList.toggle('border-[#acece2]', isValid);
-        item.classList.toggle('bg-[#d6f5f1]', isValid);
-        item.classList.toggle('text-[#1d7c6e]', isValid);
-        item.classList.toggle('border-[#f7eafb]', hasValidInput && !isValid);
-        item.classList.toggle('bg-[#f7eafb]', hasValidInput && !isValid);
-        item.classList.toggle('text-[#8a23a9]', hasValidInput && !isValid);
-        item.classList.toggle('border-[#acece2]', !hasValidInput);
-        item.classList.toggle('bg-[#eafaf8]', !hasValidInput);
-        item.classList.toggle('text-[#135349]', !hasValidInput);
+        item.classList.toggle('border-[#9cfce3]', isValid);
+        item.classList.toggle('bg-[#e6fef8]', isValid);
+        item.classList.toggle('text-[#03634a]', isValid);
+        item.classList.toggle('border-[#f7a1b5]', hasValidInput && !isValid);
+        item.classList.toggle('bg-[#fde8ed]', hasValidInput && !isValid);
+        item.classList.toggle('text-[#8d0c2a]', hasValidInput && !isValid);
+        item.classList.toggle('border-[#d8e6f3]', !hasValidInput);
+        item.classList.toggle('bg-[#ffffff]', !hasValidInput);
+        item.classList.toggle('text-[#0c1a27]', !hasValidInput);
     });
 
     container.querySelectorAll('[data-asas-note]').forEach((item) => {
@@ -304,12 +304,12 @@ async function savePraktikumHistory(form, result) {
 
     if (!result.hasValidInput) {
         status.textContent = 'Riwayat belum disimpan karena massa air belum valid.';
-        status.className = 'mt-3 rounded-lg bg-[#f7eafb] px-4 py-3 text-xs font-bold text-[#8a23a9]';
+        status.className = 'mt-3 rounded-lg bg-[#fde8ed] px-4 py-3 text-xs font-bold text-[#8d0c2a]';
         return;
     }
 
     status.textContent = 'Menyimpan riwayat praktikum ke database...';
-    status.className = 'mt-3 rounded-lg bg-[#d6f5f1] px-4 py-3 text-xs font-bold text-[#1d7c6e]';
+    status.className = 'mt-3 rounded-lg bg-[#e6fef8] px-4 py-3 text-xs font-bold text-[#03634a]';
 
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const payload = {
@@ -339,7 +339,7 @@ async function savePraktikumHistory(form, result) {
 
         if (response.status === 401) {
             status.textContent = 'Silakan login sebagai siswa agar riwayat tersimpan.';
-            status.className = 'mt-3 rounded-lg bg-[#f7eafb] px-4 py-3 text-xs font-bold text-[#8a23a9]';
+            status.className = 'mt-3 rounded-lg bg-[#fde8ed] px-4 py-3 text-xs font-bold text-[#8d0c2a]';
             return;
         }
 
@@ -349,10 +349,10 @@ async function savePraktikumHistory(form, result) {
 
         const data = await response.json();
         status.textContent = `${data.message} ID riwayat: ${data.history_id}.`;
-        status.className = 'mt-3 rounded-lg bg-[#d6f5f1] px-4 py-3 text-xs font-bold text-[#1d7c6e]';
+        status.className = 'mt-3 rounded-lg bg-[#e6fef8] px-4 py-3 text-xs font-bold text-[#03634a]';
     } catch (error) {
         status.textContent = 'Riwayat gagal disimpan. Periksa koneksi backend dan coba lagi.';
-        status.className = 'mt-3 rounded-lg bg-[#f7eafb] px-4 py-3 text-xs font-bold text-[#8a23a9]';
+        status.className = 'mt-3 rounded-lg bg-[#fde8ed] px-4 py-3 text-xs font-bold text-[#8d0c2a]';
     }
 }
 
@@ -364,16 +364,6 @@ function formatTemperature(value, fallback = '--') {
     }
 
     return number.toFixed(1);
-}
-
-function formatCompactTemperature(value) {
-    const number = Number(value);
-
-    if (!Number.isFinite(number)) {
-        return '--';
-    }
-
-    return number.toFixed(number % 1 === 0 ? 0 : 1);
 }
 
 function pushRealtimeChartPoint() {
@@ -445,14 +435,6 @@ function updateSensorInterface(reading) {
 
     document.querySelectorAll('[data-sensor-updated]').forEach((element) => {
         element.textContent = `Updated: ${reading.updated_at || '-'}`;
-    });
-
-    document.querySelectorAll('[data-lcd-line-one]').forEach((element) => {
-        element.textContent = `Hot:${formatCompactTemperature(getSensorValue('suhu_panas'))} Cold:${formatCompactTemperature(getSensorValue('suhu_dingin'))}`;
-    });
-
-    document.querySelectorAll('[data-lcd-line-two]').forEach((element) => {
-        element.textContent = `Mix:${formatCompactTemperature(getSensorValue('suhu_campuran'))}C`;
     });
 
     document.querySelectorAll('[data-asas-form]').forEach(calculateAsasBlack);

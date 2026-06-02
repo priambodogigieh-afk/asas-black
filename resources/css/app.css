@@ -1,71 +1,76 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Hanken Grotesk', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-data: 'Geist', ui-sans-serif, system-ui, sans-serif;
-    --color-turquoise-50: #eafaf8;
-    --color-turquoise-100: #d6f5f1;
-    --color-turquoise-200: #acece2;
-    --color-turquoise-300: #83e2d4;
-    --color-turquoise-400: #5ad8c5;
-    --color-turquoise-500: #30cfb7;
-    --color-turquoise-600: #27a592;
-    --color-turquoise-700: #1d7c6e;
-    --color-turquoise-800: #135349;
-    --color-turquoise-900: #0a2925;
-    --color-turquoise-950: #071d1a;
-    --color-ivory-50: #ffffe5;
-    --color-ivory-100: #ffffcc;
-    --color-ivory-200: #ffff99;
-    --color-ivory-300: #ffff66;
-    --color-ivory-400: #ffff33;
-    --color-ivory-500: #ffff00;
-    --color-ivory-600: #cccc00;
-    --color-ivory-700: #999900;
-    --color-ivory-800: #666600;
-    --color-ivory-900: #333300;
-    --color-ivory-950: #242400;
-    --color-royal-orchid-50: #f7eafb;
-    --color-royal-orchid-100: #eed5f6;
-    --color-royal-orchid-200: #deaaee;
-    --color-royal-orchid-300: #cd80e5;
-    --color-royal-orchid-400: #bd56dc;
-    --color-royal-orchid-500: #ac2bd4;
-    --color-royal-orchid-600: #8a23a9;
-    --color-royal-orchid-700: #671a7f;
-    --color-royal-orchid-800: #451155;
-    --color-royal-orchid-900: #22092a;
-    --color-royal-orchid-950: #18061e;
+    --font-data: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --color-white: #ffffff;
+    --color-dusk-blue-50: #ebf3f9;
+    --color-dusk-blue-100: #d8e6f3;
+    --color-dusk-blue-200: #b1cee7;
+    --color-dusk-blue-300: #8ab5db;
+    --color-dusk-blue-400: #639dcf;
+    --color-dusk-blue-500: #3c84c3;
+    --color-dusk-blue-600: #306a9c;
+    --color-dusk-blue-700: #244f75;
+    --color-dusk-blue-800: #18354e;
+    --color-dusk-blue-900: #0c1a27;
+    --color-dusk-blue-950: #08121b;
+    --color-bubblegum-pink-50: #fde8ed;
+    --color-bubblegum-pink-100: #fbd0da;
+    --color-bubblegum-pink-200: #f7a1b5;
+    --color-bubblegum-pink-300: #f37290;
+    --color-bubblegum-pink-400: #ef436b;
+    --color-bubblegum-pink-500: #eb1446;
+    --color-bubblegum-pink-600: #bc1038;
+    --color-bubblegum-pink-700: #8d0c2a;
+    --color-bubblegum-pink-800: #5e081c;
+    --color-bubblegum-pink-900: #2f040e;
+    --color-bubblegum-pink-950: #21030a;
+    --color-golden-pollen-50: #fff7e5;
+    --color-golden-pollen-100: #fff0cc;
+    --color-golden-pollen-200: #ffe099;
+    --color-golden-pollen-300: #ffd166;
+    --color-golden-pollen-400: #ffc233;
+    --color-golden-pollen-500: #ffb300;
+    --color-golden-pollen-600: #cc8f00;
+    --color-golden-pollen-700: #996b00;
+    --color-golden-pollen-800: #664700;
+    --color-golden-pollen-900: #332400;
+    --color-golden-pollen-950: #241900;
+    --color-emerald-50: #e6fef8;
+    --color-emerald-100: #cdfef1;
+    --color-emerald-200: #9cfce3;
+    --color-emerald-300: #6afbd4;
+    --color-emerald-400: #38fac6;
+    --color-emerald-500: #06f9b8;
+    --color-emerald-600: #05c793;
+    --color-emerald-700: #04956e;
+    --color-emerald-800: #03634a;
+    --color-emerald-900: #013225;
+    --color-emerald-950: #01231a;
 }
 
 @layer base {
-    :root,
-    .dark {
-        color-scheme: dark;
+    :root {
+        color-scheme: light;
     }
 
     body {
         min-height: 100vh;
-        background:
-            radial-gradient(circle at 12% 8%, rgba(48, 207, 183, 0.24), transparent 34%),
-            radial-gradient(circle at 88% 12%, rgba(172, 43, 212, 0.16), transparent 32%),
-            radial-gradient(circle at 52% 100%, rgba(255, 255, 102, 0.08), transparent 35%),
-            linear-gradient(135deg, #071d1a 0%, #0a2925 46%, #135349 100%);
-        color: #eafaf8;
+        background: #f7f9fb;
+        color: #191c1e;
     }
 
     .dark body {
-        background:
-            radial-gradient(circle at 12% 8%, rgba(48, 207, 183, 0.24), transparent 34%),
-            radial-gradient(circle at 88% 12%, rgba(172, 43, 212, 0.16), transparent 32%),
-            radial-gradient(circle at 52% 100%, rgba(255, 255, 102, 0.08), transparent 35%),
-            linear-gradient(135deg, #071d1a 0%, #0a2925 46%, #135349 100%);
+        background: #f7f9fb;
     }
 
     input,
@@ -94,50 +99,46 @@
     }
 
     .glass-panel {
-        border: 1px solid rgba(131, 226, 212, 0.28);
-        background:
-            linear-gradient(180deg, rgba(19, 83, 73, 0.82), rgba(10, 41, 37, 0.9));
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.30);
+        border: 1px solid #cdfef1;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(3, 99, 74, 0.05);
         backdrop-filter: blur(14px);
     }
 
     .dark .glass-panel {
-        border-color: rgba(131, 226, 212, 0.28);
-        background:
-            linear-gradient(180deg, rgba(19, 83, 73, 0.82), rgba(10, 41, 37, 0.9));
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.30);
+        border-color: #cdfef1;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(3, 99, 74, 0.05);
     }
 
     .metric-card {
-        border: 1px solid rgba(131, 226, 212, 0.25);
-        background:
-            linear-gradient(180deg, rgba(19, 83, 73, 0.78), rgba(10, 41, 37, 0.88));
-        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+        border: 1px solid #cdfef1;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(3, 99, 74, 0.05);
         backdrop-filter: blur(12px);
     }
 
     .dark .metric-card {
-        border-color: rgba(131, 226, 212, 0.25);
-        background:
-            linear-gradient(180deg, rgba(19, 83, 73, 0.78), rgba(10, 41, 37, 0.88));
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.24);
+        border-color: #cdfef1;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(3, 99, 74, 0.05);
     }
 
     .sensor-grid {
         background-image:
-            linear-gradient(rgba(131, 226, 212, 0.12) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(131, 226, 212, 0.12) 1px, transparent 1px);
+            linear-gradient(rgba(177, 206, 231, 0.12) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(177, 206, 231, 0.12) 1px, transparent 1px);
         background-size: 34px 34px;
     }
 
     .surface-panel {
-        border-color: rgba(131, 226, 212, 0.25);
-        background: rgba(10, 41, 37, 0.62);
+        border-color: #cdfef1;
+        background: #ffffff;
     }
 
     .gauge-ring {
         --value: 70;
-        background: conic-gradient(var(--gauge-color) calc(var(--value) * 1%), rgba(148, 163, 184, 0.16) 0);
+        background: conic-gradient(var(--gauge-color) calc(var(--value) * 1%), rgba(99, 157, 207, 0.16) 0);
     }
 
     .chart-shell canvas {
@@ -148,6 +149,58 @@
     .pulsate {
         animation: pulseSoft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+
+    .auth-entrance {
+        animation: authFadeUp 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .auth-card {
+        transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+    }
+
+    .auth-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 34px rgba(3, 99, 74, 0.10);
+        border-color: #9cfce3;
+    }
+
+    .auth-field {
+        animation: authFadeUp 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .auth-field:nth-child(1) {
+        animation-delay: 80ms;
+    }
+
+    .auth-field:nth-child(2) {
+        animation-delay: 140ms;
+    }
+
+    .auth-field:nth-child(3) {
+        animation-delay: 200ms;
+    }
+
+    .auth-field:nth-child(4) {
+        animation-delay: 260ms;
+    }
+
+    .auth-button {
+        transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    }
+
+    .auth-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(0, 108, 78, 0.18);
+    }
+
+    .auth-button:active {
+        transform: scale(0.98);
+    }
+
+    .auth-illustration {
+        animation: authFloat 5s ease-in-out infinite;
+        filter: drop-shadow(0 18px 28px rgba(3, 99, 74, 0.10));
+    }
 }
 
 @keyframes pulseSoft {
@@ -157,5 +210,27 @@
 
     50% {
         opacity: .42;
+    }
+}
+
+@keyframes authFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes authFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
     }
 }

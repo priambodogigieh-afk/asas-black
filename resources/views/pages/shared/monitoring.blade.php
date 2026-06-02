@@ -11,22 +11,15 @@
             <x-temperature-card label="Suhu Campuran" value="45" tone="orange" sensor="DS18B20 C" change="+0.3" sensor-key="suhu_campuran" />
         </section>
 
-        <section class="grid gap-6 lg:grid-cols-[1fr_auto]">
+        <section class="grid gap-6">
             <article class="metric-card rounded-md p-5">
-                <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">Koneksi MQTT</p>
-                <button type="button" data-mqtt-connect-button class="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#30cfb7] px-5 py-3 font-['Geist'] text-sm font-black uppercase tracking-[0.08em] text-[#071d1a] shadow-lg shadow-[#30cfb7]/20 transition hover:bg-[#83e2d4] active:scale-[0.98]">
+                <p class="font-mono text-xs font-black uppercase tracking-[0.12em] text-[#006c4e] dark:text-[#cdfef1]">Koneksi MQTT</p>
+                <button type="button" data-mqtt-connect-button class="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#006c4e] px-5 py-3 font-mono text-sm font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-[#006c4e]/30 transition hover:bg-[#006c4e] active:scale-[0.98]">
                     <span class="material-symbols-outlined text-[20px]">sensors</span>
                     Konek MQTT
                 </button>
-                <p class="mt-3 text-sm font-bold text-[#135349] dark:text-[#d6f5f1]" data-mqtt-connect-message data-sensor-status>Menunggu koneksi MQTT</p>
-                <p class="mt-1 text-xs font-bold text-[#135349] dark:text-[#d6f5f1]" data-sensor-updated>Updated: -</p>
-            </article>
-            <article class="metric-card rounded-md p-5">
-                <p class="font-['Geist'] text-xs font-black uppercase tracking-[0.12em] text-[#30cfb7] dark:text-[#83e2d4]">LCD Virtual 16x2</p>
-                <div class="mt-3 min-w-[260px] rounded-lg border border-[#83e2d4]/30 bg-[#071d1a] p-4 font-mono text-lg font-black leading-7 text-[#ffff99] shadow-inner">
-                    <div data-lcd-line-one>Hot:-- Cold:--</div>
-                    <div data-lcd-line-two>Mix:--C</div>
-                </div>
+                <p class="mt-3 text-sm font-bold text-[#191c1e] dark:text-[#e6fef8]" data-mqtt-connect-message data-sensor-status>Menunggu koneksi MQTT</p>
+                <p class="mt-1 text-xs font-bold text-[#191c1e] dark:text-[#e6fef8]" data-sensor-updated>Updated: -</p>
             </article>
         </section>
 
@@ -34,8 +27,8 @@
             <div class="metric-card rounded-md p-5">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 class="text-lg font-black text-[#071d1a] dark:text-[#eafaf8]">Grafik Suhu</h2>
-                        <p class="mt-1 text-sm text-[#135349] dark:text-[#d6f5f1]">Simulasi pergerakan suhu lokal.</p>
+                        <h2 class="text-lg font-black text-[#013225] dark:text-[#ffffff]">Grafik Suhu</h2>
+                        <p class="mt-1 text-sm text-[#191c1e] dark:text-[#e6fef8]">Simulasi pergerakan suhu lokal.</p>
                     </div>
                 </div>
                 <div class="chart-shell mt-5 h-[380px]">

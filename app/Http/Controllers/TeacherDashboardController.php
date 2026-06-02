@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\PraktikumHistory;
 use App\Models\User;
 use App\Support\Navigation;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class TeacherDashboardController extends Controller
 {
-    public function dashboard(Request $request): View
+    public function dashboard(Request $request): View|RedirectResponse
     {
-        abort_unless($request->user()?->role === 'guru', 403);
+        if ($request->user()?->role !== 'guru') {
+            return redirect()->route('student.praktikum');
+        }
 
         $students = User::query()
             ->where('role', 'siswa')
@@ -34,9 +37,11 @@ class TeacherDashboardController extends Controller
         ]);
     }
 
-    public function students(Request $request): View
+    public function students(Request $request): View|RedirectResponse
     {
-        abort_unless($request->user()?->role === 'guru', 403);
+        if ($request->user()?->role !== 'guru') {
+            return redirect()->route('student.praktikum');
+        }
 
         $students = User::query()
             ->where('role', 'siswa')
