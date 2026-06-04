@@ -133,26 +133,48 @@ function setupLogoutConfirmation() {
 function setupSidebarToggle() {
     const sidebar = document.querySelector('[data-sidebar]');
     const content = document.querySelector('[data-dashboard-content]');
-    const hideButton = document.querySelector('[data-sidebar-hide]');
-    const showButton = document.querySelector('[data-sidebar-show]');
+    const toggleButton = document.querySelector('[data-sidebar-hide]');
+    const toggleIcon = toggleButton?.querySelector('.material-symbols-outlined');
+    const brandLink = document.querySelector('[data-sidebar-brand]');
+    const logo = document.querySelector('[data-sidebar-logo]');
+    const sidebarText = document.querySelector('[data-sidebar-text]');
+    const details = document.querySelectorAll('[data-sidebar-detail]');
 
-    if (!sidebar || !content || !hideButton || !showButton) {
+    if (!sidebar || !content || !toggleButton || !toggleIcon || !brandLink || !logo || !sidebarText) {
         return;
     }
 
     const setHidden = (isHidden) => {
-        sidebar.classList.toggle('-translate-x-full', isHidden);
+        sidebar.classList.toggle('w-64', !isHidden);
+        sidebar.classList.toggle('w-20', isHidden);
         content.classList.toggle('lg:ml-64', !isHidden);
-        content.classList.toggle('lg:ml-0', isHidden);
-        showButton.classList.toggle('hidden', !isHidden);
-        showButton.classList.toggle('grid', isHidden);
+        content.classList.toggle('lg:ml-20', isHidden);
+        logo.classList.toggle('hidden', !isHidden);
+        logo.classList.toggle('grid', isHidden);
+        sidebarText.classList.toggle('hidden', isHidden);
+        details.forEach((detail) => detail.classList.toggle('hidden', isHidden));
+        toggleButton.classList.toggle('hidden', isHidden);
+        toggleButton.classList.toggle('grid', !isHidden);
+        toggleIcon.textContent = isHidden ? 'right_panel_open' : 'left_panel_close';
+        toggleButton.setAttribute('aria-label', isHidden ? 'Tampilkan sidebar' : 'Sembunyikan sidebar');
+        toggleButton.setAttribute('title', isHidden ? 'Tampilkan sidebar' : 'Sembunyikan sidebar');
         localStorage.setItem('asas-black-sidebar-hidden', isHidden ? '1' : '0');
     };
 
     setHidden(localStorage.getItem('asas-black-sidebar-hidden') === '1');
 
-    hideButton.addEventListener('click', () => setHidden(true));
-    showButton.addEventListener('click', () => setHidden(false));
+    toggleButton.addEventListener('click', () => {
+        setHidden(!sidebar.classList.contains('w-20'));
+    });
+
+    brandLink.addEventListener('click', (event) => {
+        if (!sidebar.classList.contains('w-20')) {
+            return;
+        }
+
+        event.preventDefault();
+        setHidden(false);
+    });
 }
 
 function nextValue(values) {
