@@ -34,16 +34,35 @@
 
     <nav class="mt-5 flex flex-col gap-1 px-2">
         @foreach ($items as $item)
-            @php $active = request()->routeIs($item['route']); @endphp
-            <a
-                href="{{ route($item['route']) }}"
-                class="group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition duration-200 {{ $active ? $activeClass : 'text-[#191c1e] hover:scale-[1.02] hover:bg-[#e6fef8] dark:text-[#e6fef8] dark:hover:bg-[#013225]' }}"
-            >
-                <span class="material-symbols-outlined text-[22px]">
-                    {!! $item['icon'] !!}
-                </span>
-                <span class="font-mono text-xs uppercase tracking-[0.08em]">{{ $item['label'] }}</span>
-            </a>
+            @php
+                $active = request()->routeIs($item['route']);
+                $isLogout = strtolower($item['label']) === 'logout';
+            @endphp
+
+            @if ($isLogout)
+                <form method="POST" action="{{ route('logout') }}" data-logout-form>
+                    @csrf
+                    <button
+                        type="submit"
+                        class="group flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-bold text-[#191c1e] transition duration-200 hover:scale-[1.02] hover:bg-[#e6fef8] dark:text-[#e6fef8] dark:hover:bg-[#013225]"
+                    >
+                        <span class="material-symbols-outlined text-[22px]">
+                            {!! $item['icon'] !!}
+                        </span>
+                        <span class="font-mono text-xs uppercase tracking-[0.08em]">{{ $item['label'] }}</span>
+                    </button>
+                </form>
+            @else
+                <a
+                    href="{{ route($item['route']) }}"
+                    class="group flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition duration-200 {{ $active ? $activeClass : 'text-[#191c1e] hover:scale-[1.02] hover:bg-[#e6fef8] dark:text-[#e6fef8] dark:hover:bg-[#013225]' }}"
+                >
+                    <span class="material-symbols-outlined text-[22px]">
+                        {!! $item['icon'] !!}
+                    </span>
+                    <span class="font-mono text-xs uppercase tracking-[0.08em]">{{ $item['label'] }}</span>
+                </a>
+            @endif
         @endforeach
     </nav>
 
@@ -64,10 +83,20 @@
             <span class="grid h-10 w-10 place-items-center rounded-full text-xs font-black text-white {{ $brandBg }}">AB</span>
             <span class="text-sm font-black {{ $brandText }}">Asas Black Lab</span>
         </a>
+        <div class="flex items-center gap-2">
         <select class="rounded-lg border border-[#cdfef1] bg-[#ffffff] px-3 py-2 text-sm dark:border-[#03634a]/40 dark:bg-[#013225]" onchange="if (this.value) window.location.href = this.value">
             @foreach ($items as $item)
-                <option value="{{ route($item['route']) }}" @selected(request()->routeIs($item['route']))>{{ $item['label'] }}</option>
+                @unless (strtolower($item['label']) === 'logout')
+                    <option value="{{ route($item['route']) }}" @selected(request()->routeIs($item['route']))>{{ $item['label'] }}</option>
+                @endunless
             @endforeach
         </select>
+        <form method="POST" action="{{ route('logout') }}" data-logout-form>
+            @csrf
+            <button type="submit" class="grid h-10 w-10 place-items-center rounded-lg border border-[#cdfef1] bg-white text-[#013225] dark:border-[#03634a]/40 dark:bg-[#013225] dark:text-white" aria-label="Logout">
+                <span class="material-symbols-outlined text-[20px]">logout</span>
+            </button>
+        </form>
+        </div>
     </div>
 </div>

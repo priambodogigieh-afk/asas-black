@@ -69,6 +69,67 @@ function setupRegisterForm() {
     });
 }
 
+function setupLogoutConfirmation() {
+    const forms = document.querySelectorAll('[data-logout-form]');
+
+    if (!forms.length) {
+        return;
+    }
+
+    let selectedForm = null;
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 z-[100] hidden items-center justify-center bg-[#013225]/45 px-4 backdrop-blur-sm';
+    modal.innerHTML = `
+        <div class="w-full max-w-sm rounded-lg border border-[#cdfef1] bg-white p-6 text-[#111827] shadow-2xl">
+            <div class="flex items-start gap-3">
+                <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#fff7e5] text-[#996b00]">
+                    <span class="material-symbols-outlined text-[22px]">logout</span>
+                </div>
+                <div>
+                    <h2 class="text-lg font-black">Logout akun?</h2>
+                    <p class="mt-1 text-sm font-semibold text-[#4b5563]">Apakah Anda yakin ingin keluar dari aplikasi?</p>
+                </div>
+            </div>
+            <div class="mt-6 grid grid-cols-2 gap-3">
+                <button type="button" data-logout-cancel class="rounded-md border border-[#cdfef1] bg-white px-4 py-3 text-sm font-black text-[#013225] transition hover:bg-[#e6fef8]">Tidak</button>
+                <button type="button" data-logout-confirm class="rounded-md bg-[#006c4e] px-4 py-3 text-sm font-black text-white transition hover:bg-[#013225]">Ya</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        selectedForm = null;
+    };
+
+    forms.forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            selectedForm = form;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
+    modal.querySelector('[data-logout-cancel]')?.addEventListener('click', closeModal);
+    modal.querySelector('[data-logout-confirm]')?.addEventListener('click', () => {
+        selectedForm?.submit();
+    });
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && selectedForm) {
+            closeModal();
+        }
+    });
+}
+
 function nextValue(values) {
     const last = values[values.length - 1];
     const jitter = (Math.random() - 0.5) * 0.7;
@@ -561,6 +622,7 @@ function setupAsasBlackCalculator() {
 document.addEventListener('DOMContentLoaded', () => {
     setupLoginForm();
     setupRegisterForm();
+    setupLogoutConfirmation();
     setupCharts();
     setupTemperatureJitter();
     setupAsasBlackCalculator();
