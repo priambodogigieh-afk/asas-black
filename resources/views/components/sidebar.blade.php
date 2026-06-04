@@ -18,11 +18,16 @@
     $activeClass = $isStudent ? 'bg-[#006c4e] text-white shadow-sm dark:bg-[#05c793] dark:text-[#013225]' : 'bg-[#006c4e] text-white shadow-sm dark:bg-[#cdfef1] dark:text-[#013225]';
 @endphp
 
-<aside class="fixed left-0 top-0 z-40 hidden h-screen w-64 shrink-0 flex-col border-r border-[#cdfef1]/60 bg-[#ffffff]/92 p-2 shadow-md backdrop-blur-xl dark:border-[#03634a]/30 dark:bg-[#013225]/92 lg:flex">
-    <a href="{{ route($homeRoute) }}" class="flex flex-col gap-1 px-4 py-6">
-        <span class="font-sans text-2xl font-black tracking-tight {{ $brandText }}">Asas Black</span>
-        <span class="font-mono text-xs font-bold uppercase tracking-[0.18em] text-[#191c1e] dark:text-[#e6fef8]">Thermodynamics Lab</span>
-    </a>
+<aside data-sidebar class="fixed left-0 top-0 z-40 hidden h-screen w-64 shrink-0 flex-col border-r border-[#cdfef1]/60 bg-[#ffffff]/92 p-2 shadow-md backdrop-blur-xl transition-transform duration-300 dark:border-[#03634a]/30 dark:bg-[#013225]/92 lg:flex">
+    <div class="flex items-start justify-between gap-3 px-4 py-6">
+        <a href="{{ route($homeRoute) }}" class="flex min-w-0 flex-col gap-1">
+            <span class="font-sans text-2xl font-black tracking-tight {{ $brandText }}">Asas Black</span>
+            <span class="font-mono text-xs font-bold uppercase tracking-[0.18em] text-[#191c1e] dark:text-[#e6fef8]">Thermodynamics Lab</span>
+        </a>
+        <button type="button" data-sidebar-hide class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-[#cdfef1] bg-white text-[#013225] transition hover:bg-[#e6fef8] dark:border-[#03634a]/40 dark:bg-[#013225] dark:text-white" aria-label="Sembunyikan sidebar" title="Sembunyikan sidebar">
+            <span class="material-symbols-outlined text-[20px]">left_panel_close</span>
+        </button>
+    </div>
 
     <div class="mx-2 rounded-lg border border-[#cdfef1]/70 bg-[#e6fef8]/80 px-3 py-3 text-xs text-[#191c1e] backdrop-blur dark:border-[#03634a]/30 dark:bg-[#013225]/45 dark:text-[#ffffff]">
         <div class="flex items-center justify-between">
@@ -76,6 +81,10 @@
         </div>
     </div>
 </aside>
+
+<button type="button" data-sidebar-show class="fixed left-4 top-4 z-50 hidden h-11 w-11 place-items-center rounded-xl border border-[#cdfef1] bg-white text-[#013225] shadow-lg transition hover:bg-[#e6fef8] dark:border-[#03634a]/40 dark:bg-[#013225] dark:text-white" aria-label="Tampilkan sidebar" title="Tampilkan sidebar">
+    <span class="material-symbols-outlined text-[22px]">menu</span>
+</button>
 
 <div class="border-b border-[#cdfef1]/70 bg-[#e6fef8]/95 px-4 py-3 backdrop-blur-xl dark:border-[#03634a]/30 dark:bg-[#013225]/90 lg:hidden">
     <div class="flex items-center justify-between">

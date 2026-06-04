@@ -130,6 +130,31 @@ function setupLogoutConfirmation() {
     });
 }
 
+function setupSidebarToggle() {
+    const sidebar = document.querySelector('[data-sidebar]');
+    const content = document.querySelector('[data-dashboard-content]');
+    const hideButton = document.querySelector('[data-sidebar-hide]');
+    const showButton = document.querySelector('[data-sidebar-show]');
+
+    if (!sidebar || !content || !hideButton || !showButton) {
+        return;
+    }
+
+    const setHidden = (isHidden) => {
+        sidebar.classList.toggle('-translate-x-full', isHidden);
+        content.classList.toggle('lg:ml-64', !isHidden);
+        content.classList.toggle('lg:ml-0', isHidden);
+        showButton.classList.toggle('hidden', !isHidden);
+        showButton.classList.toggle('grid', isHidden);
+        localStorage.setItem('asas-black-sidebar-hidden', isHidden ? '1' : '0');
+    };
+
+    setHidden(localStorage.getItem('asas-black-sidebar-hidden') === '1');
+
+    hideButton.addEventListener('click', () => setHidden(true));
+    showButton.addEventListener('click', () => setHidden(false));
+}
+
 function nextValue(values) {
     const last = values[values.length - 1];
     const jitter = (Math.random() - 0.5) * 0.7;
@@ -623,6 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLoginForm();
     setupRegisterForm();
     setupLogoutConfirmation();
+    setupSidebarToggle();
     setupCharts();
     setupTemperatureJitter();
     setupAsasBlackCalculator();
