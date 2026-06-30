@@ -1,9 +1,13 @@
 import Chart from 'chart.js/auto';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import { io } from 'socket.io-client';
 
-// Setup Laravel Echo (Reverb WebSocket)
+// Expose globally for Laravel Echo
 window.Pusher = Pusher;
+window.io = io;
+
+// Setup Laravel Echo (Reverb WebSocket + Socket.IO fallback)
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
@@ -14,6 +18,28 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
     disableStats: true,
 });
+
+// Listen for real-time sensor data via Echo broadcast
+window.Echo.channel('sensor-data')
+    .listen('.SensorDataUpdated', (e) => {
+        console.log('[Echo] SensorDataUpdated:', e);
+
+        // Update sensor state
+        if (typeof sensorState !== 'undefined') {
+            if (e.suhu_panas !== undefined)    sensorState.suhu_panas    = parseFloat(e.suhu_panas);
+            if (e.suhu_dingin !== undefined)   sensorState.suhu_dingin   = parseFloat(e.suhu_dingin);
+            if (e.suhu_campuran !== undefined) sensorState.suhu_campuran = parseFloat(e.suhu_campuran);
+            if (e.updated_at)                 sensorState.updated_at    = e.updated_at;
+
+            // Update DOM sensor values
+            document.querySelectorAll('[data-sensor-value]').forEach(el => {
+                const key = el.getAttribute('data-sensor-value');
+                if (sensorState[key] !== undefined) {
+                    el.textContent = parseFloat(sensorState[key]).toFixed(1);
+                }
+            });
+        }
+    });
 
 const tempSeries = {
     hot: [70, 70.4, 69.8, 70.2, 70.1, 69.7, 70.3, 70],
