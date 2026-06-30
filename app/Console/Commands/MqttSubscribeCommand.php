@@ -24,6 +24,41 @@ class MqttSubscribeCommand extends Command
 
     public function handle(): int
     {
+        $maxRetries = 50;
+        $attempt = 0;
+
+        while ($attempt < $maxRetries) {
+            $attempt++;
+            $this->info("[MQTT] Attempt {$attempt}/{$maxRetries}");
+
+            try {
+                $this->connectAndSubscribe();
+
+                // If we get here after loop ends normally, reset attempts
+                $attempt = 0;
+            } catch (Throwable $throwable) {
+                $delay = min(30, pow(2, min($attempt, 5)));
+
+                Log::warning('MQTT subscriber disconnected, retrying...', [
+                    'attempt' => $attempt,
+                    'delay' => $delay,
+                    'error' => $throwable->getMessage(),
+                ]);
+
+                $this->warn("[MQTT] Koneksi terputus: {$throwable->getMessage()}");
+                $this->info("[MQTT] Retry dalam {$delay} detik...");
+
+                sleep($delay);
+            }
+        }
+
+        $this->error('[MQTT] Melebihi batas retry. Worker berhenti.');
+
+        return self::FAILURE;
+    }
+
+    private function connectAndSubscribe(): void
+    {
         $host = (string) config('mqtt-client.connections.default.host');
         $port = (int) config('mqtt-client.connections.default.port');
         $clientId = (string) config('mqtt-client.connections.default.client_id');
@@ -31,42 +66,24 @@ class MqttSubscribeCommand extends Command
         $password = $this->normalizeCredential(config('mqtt-client.connections.default.connection_settings.auth.password'));
         $useTls = (bool) config('mqtt-client.connections.default.connection_settings.tls.enabled');
 
-        $this->info(sprintf(
-            '[MQTT] Connecting to %s:%s as %s',
-            $host,
-            $port,
-            $clientId,
-        ));
+        $this->info(sprintf('[MQTT] Connecting to %s:%s as %s', $host, $port, $clientId));
 
-        try {
-            $settings = (new ConnectionSettings)
-                ->setUsername($username)
-                ->setPassword($password)
-                ->setUseTls($useTls)
-                ->setConnectTimeout((int) config('mqtt-client.connections.default.connection_settings.connect_timeout', 60))
-                ->setSocketTimeout((int) config('mqtt-client.connections.default.connection_settings.socket_timeout', 5))
-                ->setResendTimeout((int) config('mqtt-client.connections.default.connection_settings.resend_timeout', 10))
-                ->setKeepAliveInterval((int) config('mqtt-client.connections.default.connection_settings.keep_alive_interval', 10))
-                ->setReconnectAutomatically((bool) config('mqtt-client.connections.default.connection_settings.auto_reconnect.enabled', true))
-                ->setMaxReconnectAttempts((int) config('mqtt-client.connections.default.connection_settings.auto_reconnect.max_reconnect_attempts', 10))
-                ->setDelayBetweenReconnectAttempts((int) config('mqtt-client.connections.default.connection_settings.auto_reconnect.delay_between_reconnect_attempts', 3));
+        $settings = (new ConnectionSettings)
+            ->setUsername($username)
+            ->setPassword($password)
+            ->setUseTls($useTls)
+            ->setConnectTimeout((int) config('mqtt-client.connections.default.connection_settings.connect_timeout', 60))
+            ->setSocketTimeout((int) config('mqtt-client.connections.default.connection_settings.socket_timeout', 5))
+            ->setResendTimeout((int) config('mqtt-client.connections.default.connection_settings.resend_timeout', 10))
+            ->setKeepAliveInterval((int) config('mqtt-client.connections.default.connection_settings.keep_alive_interval', 10))
+            ->setReconnectAutomatically(true)
+            ->setMaxReconnectAttempts(10)
+            ->setDelayBetweenReconnectAttempts(3);
 
-            $mqtt = MQTT::connection();
-            $mqtt->connect($settings, false);
+        $mqtt = MQTT::connection();
+        $mqtt->connect($settings, false);
 
-            $this->info('[MQTT] Connected');
-        } catch (Throwable $throwable) {
-            Log::error('MQTT subscriber failed to connect', [
-                'host' => $host,
-                'port' => $port,
-                'client_id' => $clientId,
-                'exception' => $throwable,
-            ]);
-
-            $this->error('[MQTT] Gagal terhubung: '.$throwable->getMessage());
-
-            return self::FAILURE;
-        }
+        $this->info('[MQTT] Connected');
 
         foreach (self::TOPICS as $topic => $column) {
             $mqtt->subscribe($topic, function (string $topic, string $message) use ($column): void {
@@ -74,7 +91,6 @@ class MqttSubscribeCommand extends Command
 
                 if ($temperature === null) {
                     $this->warn("[MQTT] Payload tidak valid pada {$topic}: {$message}");
-
                     return;
                 }
 
@@ -94,19 +110,7 @@ class MqttSubscribeCommand extends Command
             $this->info("[MQTT] Subscribed: {$topic}");
         }
 
-        try {
-            $mqtt->loop(true);
-        } catch (Throwable $throwable) {
-            Log::error('MQTT subscriber stopped unexpectedly', [
-                'exception' => $throwable,
-            ]);
-
-            $this->error('[MQTT] Subscriber berhenti: '.$throwable->getMessage());
-
-            return self::FAILURE;
-        }
-
-        return self::SUCCESS;
+        $mqtt->loop(true);
     }
 
     private function normalizeCredential(mixed $value): ?string
