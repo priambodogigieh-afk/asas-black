@@ -167,4 +167,107 @@ class PraktikumHistoryController extends Controller
 
         return back()->with('success', 'Nilai praktikum berhasil dihapus.');
     }
+
+    public function destroy(Request $request, PraktikumHistory $history): RedirectResponse
+    {
+        if ($request->user()?->role !== 'guru') {
+            return redirect()->route('student.praktikum');
+        }
+
+        $studentName = $history->user?->name ?? 'Siswa';
+        $history->delete();
+
+        return back()->with('success', "Riwayat praktikum milik {$studentName} berhasil dihapus.");
+    }
+
+    public function exportClassHistory(Request $request)
+    {
+        if ($request->user()?->role !== 'guru') {
+            return redirect()->route('student.history');
+        }
+
+        $selectedClass = $request->string('kelas')->toString();
+
+        if (empty($selectedClass)) {
+            return back()->withErrors(['export' => 'Pilih kelas terlebih dahulu untuk diekspor.']);
+        }
+
+        $histories = PraktikumHistory::query()
+            ->with(['user', 'grader'])
+            ->whereHas('user', fn ($query) => $query->where('kelas', $selectedClass))
+            ->latest()
+            ->get();
+
+        if ($histories->isEmpty()) {
+            return back()->with('success', "Tidak ada data praktikum untuk kelas $selectedClass yang bisa diexpor.");
+        }
+
+        $fileName = 'Penilaian_Praktikum_Kelas_' . str_replace(' ', '_', $selectedClass) . '_' . date('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($histories) {
+            $file = fopen('php://output', 'w');
+            
+            // Excel separator indicator
+            fwrite($file, "sep=;\n");
+
+            // CSV Header
+            fputcsv($file, [
+                'Waktu',
+                'Nama Siswa',
+                'Email',
+                'Kelas',
+                'NIS',
+                'Massa Panas m1 (kg)',
+                'Suhu Panas T1 (C)',
+                'Massa Dingin m2 (kg)',
+                'Suhu Dingin T2 (C)',
+                'Suhu Campuran Tc (C)',
+                'Qlepas (J)',
+                'Qterima (J)',
+                'Error Persen (%)',
+                'Status Asas Black',
+                'Nilai',
+                'Catatan Penilaian',
+                'Status Kelulusan',
+                'Dinilai Oleh',
+                'Dinilai Pada'
+            ], ';');
+
+            foreach ($histories as $history) {
+                fputcsv($file, [
+                    $history->created_at->format('Y-m-d H:i'),
+                    $history->user->name,
+                    $history->user->email,
+                    $history->user->kelas ?? '-',
+                    $history->user->nis ?? '-',
+                    $history->massa_panas,
+                    $history->suhu_panas,
+                    $history->massa_dingin,
+                    $history->suhu_dingin,
+                    $history->suhu_campuran,
+                    $history->q_lepas,
+                    $history->q_terima,
+                    $history->error_persen,
+                    $history->status,
+                    $history->nilai ?? 'Belum dinilai',
+                    $history->catatan_nilai ?? '-',
+                    $history->status_penilaian ?? '-',
+                    $history->grader?->name ?? '-',
+                    $history->dinilai_pada ? $history->dinilai_pada->format('Y-m-d H:i') : '-'
+                ], ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

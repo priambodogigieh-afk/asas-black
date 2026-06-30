@@ -23,25 +23,18 @@ Route::prefix('guru')->name('teacher.')->middleware('auth')->group(function () {
     Route::get('/dashboard', [TeacherDashboardController::class, 'dashboard'])
         ->name('dashboard');
 
-    Route::get('/monitoring-sensor', function () {
-        if (auth()->user()?->role !== 'guru') {
-            return redirect()->route('student.praktikum');
-        }
-
-        return view('pages.shared.monitoring', [
-            'items' => Navigation::teacherItems(),
-            'role' => 'Guru',
-            'title' => 'Monitoring Sensor',
-        ]);
-    })->name('monitoring');
-
     Route::get('/data-siswa', [TeacherDashboardController::class, 'students'])->name('students');
 
     Route::get('/riwayat', [PraktikumHistoryController::class, 'teacherHistory'])->name('history');
 
+    Route::get('/riwayat/export', [PraktikumHistoryController::class, 'exportClassHistory'])
+        ->name('history.export');
+
     Route::patch('/riwayat/{history}/nilai', [PraktikumHistoryController::class, 'grade'])->name('history.grade');
 
     Route::delete('/riwayat/{history}/nilai', [PraktikumHistoryController::class, 'destroyGrade'])->name('history.grade.destroy');
+
+    Route::delete('/riwayat/{history}', [PraktikumHistoryController::class, 'destroy'])->name('history.destroy');
 });
 
 Route::prefix('siswa')->name('student.')->middleware('auth')->group(function () {
@@ -58,17 +51,6 @@ Route::prefix('siswa')->name('student.')->middleware('auth')->group(function () 
 
     Route::post('/praktikum/riwayat', [PraktikumHistoryController::class, 'store'])
         ->name('praktikum.history.store');
-
-    Route::get('/materi', function () {
-        if (auth()->user()?->role !== 'siswa') {
-            return redirect()->route('teacher.dashboard');
-        }
-
-        return view('pages.shared.materi', [
-            'items' => Navigation::studentItems(),
-            'role' => 'Siswa',
-        ]);
-    })->name('materi');
 
     Route::get('/riwayat', [PraktikumHistoryController::class, 'studentHistory'])
         ->name('history');

@@ -1,6 +1,5 @@
 <x-layouts.dashboard
-    title="Praktikum Asas Black"
-    subtitle="Input massa air, hitung kalor, dan simpan riwayat praktikum."
+    title="PRAKTIKUM ASAS BLACK"
     :role="$role"
     :items="$items"
 >
@@ -47,19 +46,21 @@
                 <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
                         <p class="font-mono text-xs font-black uppercase tracking-[0.12em] text-[#006c4e] dark:text-[#cdfef1]">Koneksi MQTT</p>
-                        <button type="button" data-mqtt-connect-button class="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#006c4e] px-5 py-3 font-mono text-sm font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-[#006c4e]/30 transition hover:bg-[#006c4e] active:scale-[0.98]">
-                            <span class="material-symbols-outlined text-[20px]">sensors</span>
+                        <button type="button" data-mqtt-connect-button class="mt-3 inline-flex items-center gap-2.5 rounded-xl bg-[#006c4e] px-5 py-3.5 font-mono text-sm font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-[#006c4e]/30 transition hover:bg-[#006c4e] active:scale-[0.98]">
+                            <svg class="h-5 w-5 text-current shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                            </svg>
                             Konek MQTT
                         </button>
                         <p class="mt-3 text-sm font-bold text-[#191c1e] dark:text-[#e6fef8]" data-mqtt-connect-message data-sensor-status>Menunggu koneksi MQTT</p>
                     </div>
-                    <p class="rounded-full bg-[#013225] px-4 py-2 font-mono text-xs font-black text-[#cdfef1]" data-sensor-updated>Updated: -</p>
+                    <p class="rounded-full bg-[#013225] px-4 py-2 font-mono text-xs font-black text-[#cdfef1]" data-sensor-updated>Diperbarui: -</p>
                 </div>
             </article>
         </section>
 
         <section class="grid gap-6 xl:grid-cols-[.9fr_1.1fr]">
-            <article class="metric-card rounded-2xl p-6">
+            <article class="metric-card flex flex-col rounded-2xl p-6">
                 <h2 class="font-sans text-2xl font-black text-[#013225] dark:text-[#ffffff]">Input Data Percobaan</h2>
                 @if (session('success'))
                     <div class="mt-5 rounded-lg bg-[#e6fef8] px-4 py-3 text-sm font-bold text-[#004d36]">
@@ -116,27 +117,26 @@
                     </div>
                 </div>
                 <div class="mt-4 inline-flex items-center gap-3 rounded-full border border-[#cdfef1] bg-[#e6fef8] px-5 py-3 font-black text-[#004d36]" data-asas-status-pill>
-                    <span class="material-symbols-outlined text-[#006c4e]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                    <svg class="h-5 w-5 text-[#006c4e] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
                     <span data-asas-status>SESUAI HUKUM ASAS BLACK</span>
                 </div>
                 <p class="mt-4 rounded-lg bg-[#ffffff] px-4 py-3 text-xs font-bold text-[#191c1e] dark:bg-[#013225] dark:text-[#e6fef8]" data-asas-note>
                     Hasil dihitung otomatis berdasarkan massa air panas dan massa air dingin.
                 </p>
                 @if ($role === 'Siswa')
-                    <p class="mt-3 rounded-lg bg-[#e6fef8] px-4 py-3 text-xs font-bold text-[#004d36]" data-save-status>
-                        Tekan Hitung Asas Black untuk menyimpan riwayat praktikum
-                    </p>
+                    <p class="hidden" data-save-status></p>
                 @endif
             </article>
 
-            <section class="space-y-6">
-                <article class="metric-card rounded-2xl p-6">
+            <section class="flex flex-col h-full">
+                <article class="metric-card flex flex-col flex-1 rounded-2xl p-6">
                     <h2 class="font-sans text-2xl font-black text-[#013225] dark:text-[#ffffff]">Grafik Percobaan</h2>
-                    <div class="chart-shell mt-5 h-[340px] rounded-xl border border-[#cdfef1]/60 bg-[#e6fef8]/80 p-4 dark:border-[#03634a]/30 dark:bg-[#013225]/45">
+                    <div class="chart-shell mt-5 flex-1 min-h-[340px] rounded-xl border border-[#cdfef1]/60 bg-[#e6fef8]/80 p-4 dark:border-[#03634a]/30 dark:bg-[#013225]/45">
                         <canvas id="studentRealtimeChart"></canvas>
                     </div>
                 </article>
-
             </section>
         </section>
     </div>

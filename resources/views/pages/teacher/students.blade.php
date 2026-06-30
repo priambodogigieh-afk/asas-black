@@ -1,6 +1,6 @@
 <x-layouts.dashboard
     title="Data Siswa"
-    subtitle="Daftar akun mahasiswa/siswa yang tersimpan di database MySQL."
+    subtitle=""
     role="Guru"
     :items="$items"
 >

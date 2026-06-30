@@ -1,4 +1,19 @@
 import Chart from 'chart.js/auto';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+// Setup Laravel Echo (Reverb WebSocket)
+window.Pusher = Pusher;
+window.Echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
+    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https',
+    enabledTransports: ['ws', 'wss'],
+    disableStats: true,
+});
 
 const tempSeries = {
     hot: [70, 70.4, 69.8, 70.2, 70.1, 69.7, 70.3, 70],
@@ -135,24 +150,120 @@ function setupSidebarToggle() {
     const content = document.querySelector('[data-dashboard-content]');
     const hideButton = document.querySelector('[data-sidebar-hide]');
     const showButton = document.querySelector('[data-sidebar-show]');
-
-    if (!sidebar || !content || !hideButton || !showButton) {
+    
+    if (!sidebar || !content) {
         return;
     }
+    
+    // Create mobile backdrop/overlay if it doesn't exist
+    let backdrop = document.querySelector('[data-sidebar-backdrop]');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.setAttribute('data-sidebar-backdrop', '');
+        backdrop.className = 'fixed inset-0 z-30 bg-[#013225]/45 backdrop-blur-sm transition-opacity duration-300 hidden opacity-0';
+        document.body.appendChild(backdrop);
+    }
 
-    const setHidden = (isHidden) => {
-        sidebar.classList.toggle('-translate-x-full', isHidden);
-        content.classList.toggle('lg:ml-64', !isHidden);
-        content.classList.toggle('lg:ml-0', isHidden);
-        showButton.classList.toggle('hidden', !isHidden);
-        showButton.classList.toggle('grid', isHidden);
-        localStorage.setItem('asas-black-sidebar-hidden', isHidden ? '1' : '0');
+    const isDesktop = () => window.innerWidth >= 1024;
+
+    const updateSidebarState = () => {
+        const isCollapsed = localStorage.getItem('asas-black-sidebar-collapsed') === '1';
+        
+        if (isDesktop()) {
+            // Apply desktop collapsed/expanded states
+            sidebar.classList.toggle('collapsed', isCollapsed);
+            content.classList.toggle('collapsed-sidebar', isCollapsed);
+            
+            // On desktop, the sidebar is always on screen, so ensure translate is removed
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            
+            // Hide mobile elements
+            backdrop.classList.add('hidden');
+            backdrop.classList.remove('opacity-100');
+            
+            // Update toggle icon
+            const toggleIcon = sidebar.querySelector('[data-sidebar-toggle-icon]');
+            if (toggleIcon) {
+                const path = toggleIcon.querySelector('path');
+                if (path) {
+                    path.setAttribute('d', isCollapsed ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7');
+                } else {
+                    toggleIcon.textContent = isCollapsed ? 'right_panel_open' : 'left_panel_close';
+                }
+            }
+        } else {
+            // On mobile, sidebar is either open (on-screen) or closed (off-screen)
+            // Clean up desktop classes
+            sidebar.classList.remove('collapsed');
+            content.classList.remove('collapsed-sidebar');
+            
+            // Default icon for mobile close
+            const toggleIcon = sidebar.querySelector('[data-sidebar-toggle-icon]');
+            if (toggleIcon) {
+                const path = toggleIcon.querySelector('path');
+                if (path) {
+                    path.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+                } else {
+                    toggleIcon.textContent = 'close';
+                }
+            }
+        }
     };
 
-    setHidden(localStorage.getItem('asas-black-sidebar-hidden') === '1');
+    const toggleDesktopCollapse = () => {
+        const currentlyCollapsed = localStorage.getItem('asas-black-sidebar-collapsed') === '1';
+        localStorage.setItem('asas-black-sidebar-collapsed', currentlyCollapsed ? '0' : '1');
+        updateSidebarState();
+    };
 
-    hideButton.addEventListener('click', () => setHidden(true));
-    showButton.addEventListener('click', () => setHidden(false));
+    const openMobileSidebar = () => {
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0');
+        
+        backdrop.classList.remove('hidden');
+        // Force reflow to trigger opacity transition
+        backdrop.offsetHeight;
+        backdrop.classList.add('opacity-100');
+    };
+
+    const closeMobileSidebar = () => {
+        sidebar.classList.remove('translate-x-0');
+        sidebar.classList.add('-translate-x-full');
+        
+        backdrop.classList.remove('opacity-100');
+        setTimeout(() => {
+            if (sidebar.classList.contains('-translate-x-full')) {
+                backdrop.classList.add('hidden');
+            }
+        }, 300); // match duration-300
+    };
+
+    // Event listeners
+    if (hideButton) {
+        hideButton.addEventListener('click', () => {
+            if (isDesktop()) {
+                toggleDesktopCollapse();
+            } else {
+                closeMobileSidebar();
+            }
+        });
+    }
+
+    // Since showButton might be inside navbar which is re-rendered or dynamic, we listen at the document level
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-sidebar-show]')) {
+            openMobileSidebar();
+        }
+    });
+
+    backdrop.addEventListener('click', closeMobileSidebar);
+
+    // Watch for window resize to fix visual states
+    window.addEventListener('resize', updateSidebarState);
+
+    // Initial state setup
+    updateSidebarState();
 }
 
 function nextValue(values) {
@@ -278,7 +389,7 @@ function makeTemperatureChart(canvasId) {
 }
 
 function setupCharts() {
-    ['teacherRealtimeChart', 'studentRealtimeChart', 'monitoringChart'].forEach(makeTemperatureChart);
+    ['teacherRealtimeChart', 'studentRealtimeChart'].forEach(makeTemperatureChart);
 }
 
 function setupTemperatureJitter() {
@@ -619,7 +730,44 @@ function setupRealtimeSensorPolling() {
 
     updateSensorInterface(sensorState);
     fetchLatestSensorReading();
-    setInterval(fetchLatestSensorReading, 2000);
+
+    // Primary: Laravel Echo WebSocket via Reverb
+    let echoConnected = false;
+    let fallbackInterval = null;
+
+    try {
+        window.Echo.channel('sensor-data').listen('.SensorDataUpdated', (payload) => {
+            echoConnected = true;
+            // Clear fallback polling when WebSocket is working
+            if (fallbackInterval) {
+                clearInterval(fallbackInterval);
+                fallbackInterval = null;
+            }
+            updateSensorInterface({
+                suhu_panas: payload.suhu_panas,
+                suhu_dingin: payload.suhu_dingin,
+                suhu_campuran: payload.suhu_campuran,
+                updated_at: payload.updated_at,
+            });
+        });
+
+        // If no WS event received within 6 seconds, start fallback polling
+        const wsTimeout = setTimeout(() => {
+            if (!echoConnected) {
+                console.warn('[Echo] WebSocket tidak aktif, menggunakan polling fallback (5s)');
+                fallbackInterval = setInterval(fetchLatestSensorReading, 5000);
+            }
+        }, 6000);
+
+        // Listen for WS connection to clear the timeout
+        window.Echo.connector.pusher.connection.bind('connected', () => {
+            clearTimeout(wsTimeout);
+        });
+
+    } catch (err) {
+        console.warn('[Echo] Gagal inisialisasi WebSocket, gunakan polling fallback:', err);
+        fallbackInterval = setInterval(fetchLatestSensorReading, 5000);
+    }
 }
 
 function setupAsasBlackCalculator() {

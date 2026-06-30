@@ -8,7 +8,7 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Hanken Grotesk', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Plus Jakarta Sans', 'Hanken Grotesk', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-data: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --color-white: #ffffff;
@@ -233,4 +233,120 @@
     50% {
         transform: translateY(-10px);
     }
+}
+
+/* Sidebar and main content layout transitions */
+aside[data-sidebar] {
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1), transform 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms, border-color 300ms !important;
+}
+
+div[data-dashboard-content] {
+    transition: margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Collapsed Sidebar Styles on Desktop (lg screen) */
+@media (min-width: 1024px) {
+    aside[data-sidebar].collapsed {
+        width: 80px !important;
+    }
+    
+    aside[data-sidebar].collapsed .hide-on-collapsed {
+        display: none !important;
+    }
+    
+    aside[data-sidebar].collapsed .show-on-collapsed {
+        display: block !important;
+    }
+    
+    /* Center the icon and remove padding/margins for compact view */
+    aside[data-sidebar].collapsed nav a,
+    aside[data-sidebar].collapsed nav button {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    aside[data-sidebar].collapsed .brand-container {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    aside[data-sidebar].collapsed .profile-container {
+        padding-left: 4px;
+        padding-right: 4px;
+        justify-content: center;
+    }
+    
+    div[data-dashboard-content].collapsed-sidebar {
+        margin-left: 80px !important;
+    }
+}
+
+/* Custom animations for metric card icons */
+.animate-float-slow {
+    display: inline-block;
+    animation: floatSlow 3.5s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+    display: inline-block;
+    animation: spinSlow 12s linear infinite;
+}
+
+.animate-wave-slow {
+    display: inline-block;
+    animation: waveSlow 5s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes spinSlow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes waveSlow {
+    0%, 100% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+    }
+    33% {
+        transform: translateX(3px) translateY(-2px) rotate(1deg);
+    }
+    66% {
+        transform: translateX(-3px) translateY(2px) rotate(-1deg);
+    }
+}
+
+
+
+/* LCD Virtual Display */
+.lcd-display {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    user-select: none;
+}
+
+.lcd-text::after {
+    content: 'I';
+    animation: lcdBlink 1.1s step-end infinite;
+    margin-left: 1px;
+    opacity: 0;
+    font-size: 0.6em;
+    color: #06f9b8;
+}
+
+@keyframes lcdBlink {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
 }

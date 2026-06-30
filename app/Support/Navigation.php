@@ -8,10 +8,9 @@ class Navigation
     {
         return [
             ['label' => 'Dashboard', 'route' => 'teacher.dashboard', 'icon' => 'dashboard'],
-            ['label' => 'Monitoring Sensor', 'route' => 'teacher.monitoring', 'icon' => 'sensors'],
             ['label' => 'Data Siswa', 'route' => 'teacher.students', 'icon' => 'group'],
             ['label' => 'Penilaian', 'route' => 'teacher.history', 'icon' => 'rate_review'],
-            ['label' => 'Logout', 'route' => 'login', 'icon' => 'logout'],
+            ['label' => 'Keluar', 'route' => 'login', 'icon' => 'logout'],
         ];
     }
 
@@ -19,9 +18,8 @@ class Navigation
     {
         return [
             ['label' => 'Praktikum', 'route' => 'student.praktikum', 'icon' => 'calculate'],
-            ['label' => 'Materi', 'route' => 'student.materi', 'icon' => 'menu_book'],
             ['label' => 'Riwayat', 'route' => 'student.history', 'icon' => 'history'],
-            ['label' => 'Logout', 'route' => 'login', 'icon' => 'logout'],
+            ['label' => 'Keluar', 'route' => 'login', 'icon' => 'logout'],
         ];
     }
 }

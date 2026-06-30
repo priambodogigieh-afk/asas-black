@@ -1,6 +1,6 @@
 @props([
     'title' => 'Dashboard',
-    'subtitle' => 'Monitoring praktikum Asas Black',
+    'subtitle' => '',
     'role' => 'Guru',
     'items' => [],
 ])

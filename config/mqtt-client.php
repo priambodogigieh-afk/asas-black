@@ -32,8 +32,8 @@ return [
                     'alpn' => env('MQTT_TLS_ALPN'),
                 ],
                 'auth' => [
-                    'username' => env('MQTT_USERNAME', env('MQTT_AUTH_USERNAME')),
-                    'password' => env('MQTT_PASSWORD', env('MQTT_AUTH_PASSWORD')),
+                    'username' => env('MQTT_USERNAME'),
+                    'password' => env('MQTT_PASSWORD'),
                 ],
                 'last_will' => [
                     'topic' => env('MQTT_LAST_WILL_TOPIC'),
